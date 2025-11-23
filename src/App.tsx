@@ -256,6 +256,11 @@ const App: React.FC = () => {
   
   const [cookieConsent, setCookieConsent] = useState(false);
 
+  // Automatyczne przewijanie do góry przy zmianie widoku (zakładki)
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+
   useEffect(() => {
     const initApp = async () => {
         if (localStorage.getItem('skoczek_cookie_consent') === 'true') {
