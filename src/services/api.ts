@@ -1,9 +1,12 @@
+
 import { supabase } from './supabaseClient';
 import { User, ServiceRequest, ServiceStatus, UserRole, DeliveryMethod } from '../types';
 
 export const ApiService = {
   auth: {
     register: async (data: Omit<User, 'id' | 'role'>): Promise<{ user: User }> => {
+      // WERSJA PRODUKCYJNA: Zawsze nadajemy rolę CLIENT.
+      // Rolę ADMIN nadaje się wyłącznie ręcznie w panelu Supabase.
       const assignedRole = UserRole.CLIENT;
 
       const { data: authData, error: authError } = await supabase.auth.signUp({

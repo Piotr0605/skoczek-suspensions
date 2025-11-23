@@ -79,7 +79,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <>
-                <input required placeholder="Imię i Nazwisko (wpisz ADMIN aby testować panel)" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition" 
+                <input required placeholder="Imię i Nazwisko" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition" 
                   value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 <input required placeholder="Telefon" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition" 
                   value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
