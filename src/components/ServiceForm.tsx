@@ -1,4 +1,4 @@
-iimport React, { useState } from 'react';
+import React, { useState } from 'react';
 import { User, DeliveryMethod } from '../types';
 import { FULL_REGULATIONS, PRIVACY_POLICY } from '../constants';
 import { ApiService } from '../services/api';
