@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { User } from './types';
 import { ApiService } from './services/api';
@@ -74,7 +73,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-black"><X /></button>
         <div className="p-8">
           <h2 className="text-2xl font-bold text-skoczek-primary mb-2">{isLogin ? 'Zaloguj się' : 'Utwórz konto'}</h2>
-          <p className="text-gray-500 text-sm mb-6">Zarządzaj swoimi naprawami w bazie danych Skoczek Suspensions.</p>
+          <p className="text-gray-500 text-sm mb-6">Zarządzaj swoimi naprawami w bazie danych Oddaj Amora.</p>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
@@ -256,7 +255,6 @@ const App: React.FC = () => {
   
   const [cookieConsent, setCookieConsent] = useState(false);
 
-  // Automatyczne przewijanie do góry przy zmianie widoku (zakładki)
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [view]);
@@ -355,8 +353,8 @@ const App: React.FC = () => {
                   <SuspensionLogo className="w-full h-full text-skoczek-primary" />
                </div>
                <div className="flex flex-col leading-none">
-                 <span className="text-2xl font-black tracking-tighter text-black uppercase">SKOCZEK</span>
-                 <span className="text-sm font-bold tracking-widest text-gray-500 uppercase">Suspensions</span>
+                 <span className="text-2xl font-black tracking-tighter text-black uppercase">ODDAJ</span>
+                 <span className="text-sm font-bold tracking-widest text-gray-500 uppercase">AMORA</span>
                </div>
             </div>
 
@@ -579,7 +577,7 @@ const App: React.FC = () => {
                     <h2 className="text-3xl font-black text-black uppercase tracking-tight mb-8 border-l-4 border-skoczek-primary pl-6">Regulamin Serwisu</h2>
                     <div className="prose max-w-none">
                        <p className="text-gray-600 mb-6 font-medium">
-                          Prosimy o zapoznanie się z poniższymi zasadami świadczenia usług serwisowych przez Skoczek Suspensions.
+                          Prosimy o zapoznanie się z poniższymi zasadami świadczenia usług serwisowych przez Oddaj Amora.
                        </p>
                        <div className="bg-gray-50 p-6 rounded border border-gray-200 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed">
                           {FULL_REGULATIONS}
@@ -698,7 +696,7 @@ const App: React.FC = () => {
       <footer className="bg-white border-t border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
            <div>
-             <h4 className="text-xl font-black text-black uppercase tracking-tighter">SKOCZEK <span className="text-skoczek-primary">SUSPENSIONS</span></h4>
+             <h4 className="text-xl font-black text-black uppercase tracking-tighter">ODDAJ <span className="text-skoczek-primary">AMORA</span></h4>
              <p className="text-gray-500 text-sm mt-2">
                Profesjonalny serwis rowerowy w Białymstoku.
              </p>
@@ -715,7 +713,7 @@ const App: React.FC = () => {
            </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 mt-8 pt-8 border-t border-gray-100 text-center text-gray-400 text-xs">
-           &copy; {new Date().getFullYear()} Skoczek Suspensions.
+           &copy; {new Date().getFullYear()} Oddaj Amora.
         </div>
       </footer>
 

@@ -1,8 +1,6 @@
-
-
 import { PricingCategory } from './types';
 
-export const APP_NAME = "Skoczek Suspensions";
+export const APP_NAME = "Oddaj Amora";
 export const ADDRESS = "ul. Mickiewicza 39, 15-213 Białystok";
 export const PHONE = "+48 884 343 148";
 export const EMAIL = "galeriarowerowapl@gmail.com";
@@ -133,7 +131,6 @@ export const PRICING_DATA: PricingCategory[] = [
   }
 ];
 
-// Pełna treść regulaminu
 export const FULL_REGULATIONS = `REGULAMIN SERWISU AMORTYZATORÓW ROWEROWYCH oddajamora.pl
 Obowiązuje od dnia [24.11.2025]
 
@@ -213,7 +210,6 @@ VI. Postanowienia Końcowe
 • Serwis zastrzega sobie prawo do zmiany Regulaminu z ważnych przyczyn. Zmiany wchodzą w życie po upływie 14 dni od ich publikacji.
 • W sprawach nieuregulowanych zastosowanie mają przepisy prawa polskiego, w szczególności Kodeksu Cywilnego oraz Ustawy o Prawach Konsumenta.`;
 
-// Pełna treść Polityki Prywatności
 export const PRIVACY_POLICY = `Polityka Prywatności i Klauzula Informacyjna RODO serwisu oddajamora.pl
 
 Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych przekazanych przez Użytkowników w związku z korzystaniem z serwisu internetowego oddajamora.pl.

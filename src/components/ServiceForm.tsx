@@ -6,14 +6,9 @@ import { Check, AlertCircle, Calendar, Truck, User as UserIcon } from 'lucide-re
 import emailjs from '@emailjs/browser';
 
 // --- EMAILJS CONFIGURATION ---
-// 1. Service ID: Wzięte z Twojego zrzutu ekranu
 const EMAILJS_SERVICE_ID = 'service_kisfjge'; 
-
-// 2. Template ID: Wejdź w "Email Templates", stwórz szablon i wklej tu jego ID
-const EMAILJS_TEMPLATE_ID: string = 'template_034dgd2'; // np. template_abc123
-
-// 3. Public Key: Wejdź w Account -> API Keys -> Public Key i wklej go tutaj
-const EMAILJS_PUBLIC_KEY: string = 'QAmELeB9ozCGAw_oN'; // np. user_XaB12...
+const EMAILJS_TEMPLATE_ID: string = 'template_034dgd2';
+const EMAILJS_PUBLIC_KEY: string = 'QAmELeB9ozCGAw_oN';
 
 interface ServiceFormProps {
   user: User | null;
@@ -67,13 +62,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
       });
 
       // 2. Send Email Notification (EmailJS)
-      // USUNIĘTO BŁĘDNY WARUNEK BLOKUJĄCY WYSYŁKĘ
       try {
         await emailjs.send(
             EMAILJS_SERVICE_ID,
             EMAILJS_TEMPLATE_ID,
             {
-                to_name: "Skoczek Suspensions",
+                to_name: "Oddaj Amora", // Zmieniono na nową nazwę
                 from_name: user.name,
                 from_email: user.email,
                 from_phone: user.phone,
@@ -86,7 +80,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         );
       } catch (emailError) {
           console.error("Failed to send email notification:", emailError);
-          // Opcjonalnie: możesz dodać alert, ale lepiej nie blokować sukcesu formularza z powodu błędu maila
       }
 
       onSuccess();
