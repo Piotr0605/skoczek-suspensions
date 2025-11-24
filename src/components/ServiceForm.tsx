@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+iimport React, { useState } from 'react';
 import { User, DeliveryMethod } from '../types';
-import { FULL_REGULATIONS } from '../constants';
+import { FULL_REGULATIONS, PRIVACY_POLICY } from '../constants';
 import { ApiService } from '../services/api';
 import { Check, AlertCircle, Calendar, Truck, User as UserIcon } from 'lucide-react';
 import emailjs from '@emailjs/browser';
@@ -68,26 +67,26 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
       });
 
       // 2. Send Email Notification (EmailJS)
-      if (EMAILJS_TEMPLATE_ID !== 'template_034dgd2' && EMAILJS_PUBLIC_KEY !== 'QAmELeB9ozCGAw_oN') {
-          try {
-            await emailjs.send(
-                EMAILJS_SERVICE_ID,
-                EMAILJS_TEMPLATE_ID,
-                {
-                    to_name: "Skoczek Suspensions",
-                    from_name: user.name,
-                    from_email: user.email,
-                    from_phone: user.phone,
-                    component_model: formData.componentModel,
-                    problem_description: formData.problemDescription,
-                    delivery_method: formData.deliveryMethod,
-                    preferred_date: formData.preferredDate
-                },
-                EMAILJS_PUBLIC_KEY
-            );
-          } catch (emailError) {
-              console.error("Failed to send email notification:", emailError);
-          }
+      // USUNIĘTO BŁĘDNY WARUNEK BLOKUJĄCY WYSYŁKĘ
+      try {
+        await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            {
+                to_name: "Skoczek Suspensions",
+                from_name: user.name,
+                from_email: user.email,
+                from_phone: user.phone,
+                component_model: formData.componentModel,
+                problem_description: formData.problemDescription,
+                delivery_method: formData.deliveryMethod,
+                preferred_date: formData.preferredDate
+            },
+            EMAILJS_PUBLIC_KEY
+        );
+      } catch (emailError) {
+          console.error("Failed to send email notification:", emailError);
+          // Opcjonalnie: możesz dodać alert, ale lepiej nie blokować sukcesu formularza z powodu błędu maila
       }
 
       onSuccess();
