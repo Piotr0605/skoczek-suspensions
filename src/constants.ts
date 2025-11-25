@@ -66,7 +66,7 @@ export const PRICING_DATA: PricingCategory[] = [
       {
         name: 'Cannondale',
         rows: [
-           { model: 'Z osobną gumową na ładzę', priceService: '450', priceFull: null },
+           { model: 'Z osłoną gumową na ladze', priceService: '450', priceFull: null },
            { model: 'Bez osłony gumowej / Ocho / Oliver', priceService: '500', priceFull: null },
            { model: 'Fatty', priceService: '350', priceFull: null },
         ]
