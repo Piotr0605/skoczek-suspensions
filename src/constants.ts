@@ -66,9 +66,31 @@ export const PRICING_DATA: PricingCategory[] = [
       {
         name: 'Cannondale',
         rows: [
-           { model: 'Z osłoną gumową na ladze', priceService: '450', priceFull: null },
+           { model: 'Z osobną gumową na ładzę', priceService: '450', priceFull: null },
            { model: 'Bez osłony gumowej / Ocho / Oliver', priceService: '500', priceFull: null },
            { model: 'Fatty', priceService: '350', priceFull: null },
+        ]
+      },
+      {
+        name: 'DVO',
+        rows: [
+           { model: 'Wszystkie modele', priceService: '300', priceFull: null }
+        ]
+      },
+      {
+        name: 'Ohlins',
+        rows: [
+           { model: 'Serwis olejowy', priceService: '300', priceFull: null },
+           { model: 'Serwis pełny 100h', priceService: '1000', priceFull: null },
+           { model: 'Serwis 200h', priceService: '1300', priceFull: null }
+        ]
+      },
+      {
+        name: 'Marzocchi',
+        rows: [
+           { model: '30-32', priceService: '300', priceFull: null },
+           { model: '35', priceService: '300', priceFull: null },
+           { model: '38', priceService: '330', priceFull: null }
         ]
       }
     ]
@@ -117,6 +139,32 @@ export const PRICING_DATA: PricingCategory[] = [
         rows: [
            { model: 'Wszystkie modele Air', priceService: '280', priceFull: null }
         ]
+      },
+      {
+        name: 'DVO',
+        rows: [
+           { model: 'Wszystkie modele', priceService: '270', priceFull: null }
+        ]
+      },
+      {
+        name: 'Ohlins',
+        rows: [
+           { model: 'Serwis olejowy', priceService: '350', priceFull: null },
+           { model: 'Serwis pełny 100h', priceService: '750', priceFull: null },
+           { model: 'TTX22 Air 200h', priceService: '950', priceFull: null }
+        ]
+      },
+      {
+        name: 'Cane Creek',
+        rows: [
+           { model: 'Wszystkie modele', priceService: '300', priceFull: null }
+        ]
+      },
+      {
+        name: 'Marzocchi',
+        rows: [
+           { model: 'Wszystkie modele', priceService: '300', priceFull: null }
+        ]
       }
     ]
   },
@@ -126,7 +174,10 @@ export const PRICING_DATA: PricingCategory[] = [
     services: [
       { name: 'Montaż i demontaż dampera do ramy', price: '50-100' },
       { name: 'Montaż/Demontaż amortyzatora w rowerze (zależnie od skomplikowania)', price: '60-100' },
-      { name: 'Montaż i demontaż sztycy regulowanej (np. Reverb)', price: '30-100' }
+      { name: 'Montaż i demontaż sztycy regulowanej (np. Reverb)', price: '30-100' },
+      { name: 'Sztyce z nierozbieralnym kartridżem', price: '150' },
+      { name: 'Sztyce hydrauliczne w pełni rozbieralne', price: '200-250' },
+      { name: 'Sztyce mechaniczne', price: '150' }
     ]
   }
 ];
