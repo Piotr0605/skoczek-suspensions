@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ServiceRequest, ServiceStatus } from '../types';
 import { ApiService } from '../services/api';
-import { RefreshCw, Save, Filter, Phone } from 'lucide-react';
+import { RefreshCw, Save, Filter, Phone, Archive } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<ServiceStatus | 'ALL'>('ALL');
+  const [filterStatus, setFilterStatus] = useState<ServiceStatus | 'ALL' | 'HISTORY'>('ALL');
   
+  // Local state for editing rows (id -> { status, cost, isDirty })
   const [edits, setEdits] = useState<Record<string, { status: ServiceStatus, cost: string }>>({});
 
   const fetchRequests = async () => {
@@ -53,8 +54,10 @@ const AdminDashboard: React.FC = () => {
 
     try {
         await ApiService.requests.updateStatus(id, edit.status, parseFloat(edit.cost) || 0);
+        // Refresh local data to match
         setRequests(prev => prev.map(r => r.id === id ? { ...r, status: edit.status, estimatedCost: parseFloat(edit.cost) || 0 } : r));
         
+        // Remove from edits
         const newEdits = { ...edits };
         delete newEdits[id];
         setEdits(newEdits);
@@ -63,7 +66,28 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const filteredRequests = requests.filter(r => filterStatus === 'ALL' || r.status === filterStatus);
+  // Szybka archiwizacja (ustawienie statusu na COMPLETED)
+  const archiveRequest = async (id: string) => {
+      if (!window.confirm("Czy na pewno chcesz zakończyć to zlecenie i przenieść je do historii?")) return;
+      try {
+          await ApiService.requests.updateStatus(id, ServiceStatus.COMPLETED);
+          setRequests(prev => prev.map(r => r.id === id ? { ...r, status: ServiceStatus.COMPLETED } : r));
+      } catch (e) {
+          alert("Błąd archiwizacji");
+      }
+  };
+
+  // Logika filtrowania
+  const filteredRequests = requests.filter(r => {
+      if (filterStatus === 'HISTORY') {
+          return r.status === ServiceStatus.COMPLETED;
+      }
+      if (filterStatus === 'ALL') {
+          // W widoku "Wszystkie" pokazujemy wszystko OPRÓCZ zakończonych (bo one są w historii)
+          return r.status !== ServiceStatus.COMPLETED;
+      }
+      return r.status === filterStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -85,12 +109,19 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
          <Filter className="w-4 h-4 text-gray-500 mr-2" />
-         <button onClick={() => setFilterStatus('ALL')} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === 'ALL' ? 'bg-black text-white' : 'bg-white text-gray-600 border'}`}>Wszystkie</button>
+         <button onClick={() => setFilterStatus('ALL')} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === 'ALL' ? 'bg-black text-white' : 'bg-white text-gray-600 border'}`}>Bieżące</button>
          <button onClick={() => setFilterStatus(ServiceStatus.PENDING)} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === ServiceStatus.PENDING ? 'bg-yellow-500 text-white' : 'bg-white text-gray-600 border'}`}>Nowe</button>
          <button onClick={() => setFilterStatus(ServiceStatus.IN_PROGRESS)} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === ServiceStatus.IN_PROGRESS ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 border'}`}>W trakcie</button>
          <button onClick={() => setFilterStatus(ServiceStatus.READY)} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === ServiceStatus.READY ? 'bg-green-500 text-white' : 'bg-white text-gray-600 border'}`}>Gotowe</button>
+         
+         <div className="h-6 w-px bg-gray-300 mx-2"></div>
+         
+         <button onClick={() => setFilterStatus('HISTORY')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === 'HISTORY' ? 'bg-gray-700 text-white' : 'bg-white text-gray-600 border'}`}>
+             <Archive className="w-3 h-3" /> Historia
+         </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -103,7 +134,7 @@ const AdminDashboard: React.FC = () => {
                 <th className="p-4 border-b">Sprzęt / Usterka</th>
                 <th className="p-4 border-b w-48">Status</th>
                 <th className="p-4 border-b w-32">Wycena (PLN)</th>
-                <th className="p-4 border-b w-24">Akcje</th>
+                <th className="p-4 border-b w-32 text-center">Akcje</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -111,9 +142,10 @@ const AdminDashboard: React.FC = () => {
                 const isEditing = !!edits[req.id];
                 const currentStatus = edits[req.id]?.status || req.status;
                 const currentCost = edits[req.id]?.cost !== undefined ? edits[req.id].cost : (req.estimatedCost || '');
+                const isCompleted = req.status === ServiceStatus.COMPLETED;
 
                 return (
-                  <tr key={req.id} className="hover:bg-gray-50 transition group">
+                  <tr key={req.id} className={`hover:bg-gray-50 transition group ${isCompleted ? 'opacity-60 bg-gray-50' : ''}`}>
                     <td className="p-4 align-top">
                       <div className="font-bold text-gray-900">{new Date(req.createdAt).toLocaleDateString('pl-PL')}</div>
                       <div className="text-xs text-gray-400 font-mono mt-1">{req.id.slice(0, 8)}...</div>
@@ -164,15 +196,25 @@ const AdminDashboard: React.FC = () => {
                          <span className="absolute left-2 top-2 text-xs text-gray-400">PLN</span>
                        </div>
                     </td>
-                    <td className="p-4 align-top">
+                    <td className="p-4 align-top text-center flex gap-2 justify-center">
                        {isEditing && (
                          <button 
                            onClick={() => saveChanges(req.id)}
-                           className="bg-skoczek-primary text-white p-2 rounded hover:bg-skoczek-primaryHover transition w-full flex justify-center items-center shadow-md"
+                           className="bg-skoczek-primary text-white p-2 rounded hover:bg-skoczek-primaryHover transition shadow-md"
                            title="Zapisz zmiany"
                          >
                            <Save className="w-4 h-4" />
                          </button>
+                       )}
+                       
+                       {!isCompleted && (
+                           <button 
+                             onClick={() => archiveRequest(req.id)}
+                             className="bg-gray-100 text-gray-500 p-2 rounded hover:bg-gray-200 border border-gray-200 transition"
+                             title="Zakończ i przenieś do historii"
+                           >
+                             <Archive className="w-4 h-4" />
+                           </button>
                        )}
                     </td>
                   </tr>
@@ -182,7 +224,7 @@ const AdminDashboard: React.FC = () => {
           </table>
         </div>
         {filteredRequests.length === 0 && (
-            <div className="p-12 text-center text-gray-500">Brak zgłoszeń o wybranym statusie.</div>
+            <div className="p-12 text-center text-gray-500">Brak zgłoszeń w tej kategorii.</div>
         )}
       </div>
     </div>
