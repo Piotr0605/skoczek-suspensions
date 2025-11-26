@@ -97,7 +97,7 @@ const AdminDashboard: React.FC = () => {
              <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded uppercase">Admin</span>
              <h2 className="text-3xl font-black text-black tracking-tight uppercase">Panel Mechanika</h2>
            </div>
-           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi.</p>
+           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi. SZEF TO PRYWACIARZ!!!</p>
         </div>
         <div className="flex gap-2">
             <button 
