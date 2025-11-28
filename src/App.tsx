@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react'; // Import Analytics
 import { User } from './types';
 import { ApiService } from './services/api';
 import { ADDRESS, PHONE, EMAIL, PRICING_DATA, FULL_REGULATIONS, PRIVACY_POLICY } from './constants';
@@ -424,7 +425,6 @@ const App: React.FC = () => {
       </nav>
 
       <main className="flex-grow">
-        
         {view === 'HOME' && (
           <>
             <section className="relative py-20 lg:py-32 bg-white overflow-hidden">
@@ -719,6 +719,7 @@ const App: React.FC = () => {
 
       <CookieBanner onAccept={handleAcceptCookies} />
       {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} onLoginSuccess={(u) => { setUser(u); setIsAuthModalOpen(false); }} />}
+      <Analytics />
     </div>
   );
 };
