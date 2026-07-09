@@ -7,6 +7,7 @@ import ServiceForm from './components/ServiceForm';
 import Dashboard from './components/Dashboard';
 import AdminDashboard from './components/AdminDashboard';
 import CookieBanner from './components/CookieBanner';
+import { validatePassword, validateRegistration } from './utils/validation';
 import { 
   Menu, X, MapPin, Phone, Mail, ChevronRight, 
   ShieldCheck, User as UserIcon, LogOut,
@@ -49,6 +50,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
     setError('');
     setLoading(true);
     try {
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        setError(passwordError);
+        return;
+      }
+
+      if (!isLogin) {
+        const registrationError = validateRegistration(formData.name, formData.phone);
+        if (registrationError) {
+          setError(registrationError);
+          return;
+        }
+      }
+
       let result;
       if (isLogin) {
         result = await ApiService.auth.login(formData.email, formData.password);
@@ -87,7 +102,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
             )}
             <input required type="email" placeholder="Email" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition" 
               value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-            <input required type="password" placeholder="Hasło" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition" 
+            <input required type="password" placeholder="Hasło (min. 8 znaków)" minLength={8} className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition" 
               value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
             
             {error && <p className="text-red-600 text-sm font-medium bg-red-50 p-2 rounded">{error}</p>}

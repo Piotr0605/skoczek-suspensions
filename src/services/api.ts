@@ -1,12 +1,43 @@
 
 import { supabase } from './supabaseClient';
 import { User, ServiceRequest, ServiceStatus, UserRole, DeliveryMethod } from '../types';
+import { getUserRole } from '../utils/auth';
+
+function mapAuthUser(authUser: {
+  id: string;
+  email?: string;
+  app_metadata?: Record<string, unknown>;
+  user_metadata?: Record<string, unknown>;
+}): User {
+  return {
+    id: authUser.id,
+    email: authUser.email!,
+    name: (authUser.user_metadata?.name as string) || '',
+    phone: (authUser.user_metadata?.phone as string) || '',
+    role: getUserRole(authUser),
+  };
+}
+
+async function requireSession() {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session?.user) {
+    throw new Error('Sesja wygasła. Zaloguj się ponownie.');
+  }
+  return session;
+}
+
+async function requireAdmin() {
+  const session = await requireSession();
+  const role = getUserRole(session.user);
+  if (role !== UserRole.ADMIN) {
+    throw new Error('Brak uprawnień administratora.');
+  }
+  return session;
+}
 
 export const ApiService = {
   auth: {
     register: async (data: Omit<User, 'id' | 'role'>): Promise<{ user: User }> => {
-      // WERSJA PRODUKCYJNA: Zawsze nadajemy rolę CLIENT.
-      // Rolę ADMIN nadaje się wyłącznie ręcznie w panelu Supabase.
       const assignedRole = UserRole.CLIENT;
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -16,43 +47,30 @@ export const ApiService = {
           data: {
             name: data.name,
             phone: data.phone,
-            role: assignedRole
-          }
-        }
+          },
+        },
       });
 
-      if (authError) throw new Error(authError.message);
-      if (!authData.user) throw new Error('Nie udało się utworzyć użytkownika.');
+      if (authError) {
+        throw new Error('Nie udało się utworzyć konta. Sprawdź dane lub użyj innego adresu e-mail.');
+      }
+      if (!authData.user) {
+        throw new Error('Nie udało się utworzyć użytkownika.');
+      }
 
-      const newUser: User = {
-        id: authData.user.id,
-        email: authData.user.email!,
-        name: authData.user.user_metadata.name,
-        phone: authData.user.user_metadata.phone,
-        role: authData.user.user_metadata.role || UserRole.CLIENT
-      };
-
-      return { user: newUser };
+      return { user: mapAuthUser(authData.user) };
     },
 
     login: async (email: string, password: string): Promise<{ user: User }> => {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) throw new Error('Nieprawidłowy email lub hasło.');
       if (!data.user) throw new Error('Błąd logowania.');
 
-      const user: User = {
-        id: data.user.id,
-        email: data.user.email!,
-        name: data.user.user_metadata.name,
-        phone: data.user.user_metadata.phone,
-        role: data.user.user_metadata.role || UserRole.CLIENT
-      };
-
-      return { user };
+      return { user: mapAuthUser(data.user) };
     },
 
     logout: async () => {
@@ -62,42 +80,33 @@ export const ApiService = {
 
     me: async (): Promise<User | null> => {
       const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session?.user) return null;
-
-      const user: User = {
-        id: session.user.id,
-        email: session.user.email!,
-        name: session.user.user_metadata.name,
-        phone: session.user.user_metadata.phone,
-        role: session.user.user_metadata.role || UserRole.CLIENT
-      };
-      
-      return user;
-    }
+      return mapAuthUser(session.user);
+    },
   },
 
   requests: {
-    create: async (userId: string, data: { 
-      componentModel: string; 
-      problemDescription: string; 
-      deliveryMethod: DeliveryMethod; 
+    create: async (data: {
+      componentModel: string;
+      problemDescription: string;
+      deliveryMethod: DeliveryMethod;
       preferredDate: string;
       clientName: string;
       clientPhone: string;
     }): Promise<ServiceRequest> => {
-      
+      const session = await requireSession();
+
       const { data: result, error } = await supabase
         .from('service_requests')
         .insert({
-          user_id: userId,
+          user_id: session.user.id,
           component_model: data.componentModel,
           problem_description: data.problemDescription,
           delivery_method: data.deliveryMethod,
           preferred_date: data.preferredDate,
           client_name: data.clientName,
           client_phone: data.clientPhone,
-          status: ServiceStatus.PENDING
+          status: ServiceStatus.PENDING,
         })
         .select()
         .single();
@@ -110,11 +119,13 @@ export const ApiService = {
       return ApiService.mapResponse(result);
     },
 
-    getAllForUser: async (userId: string): Promise<ServiceRequest[]> => {
+    getAllForUser: async (): Promise<ServiceRequest[]> => {
+      const session = await requireSession();
+
       const { data, error } = await supabase
         .from('service_requests')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -126,6 +137,8 @@ export const ApiService = {
     },
 
     getAll: async (): Promise<ServiceRequest[]> => {
+      await requireAdmin();
+
       const { data: requests, error } = await supabase
         .from('service_requests')
         .select('*')
@@ -133,14 +146,16 @@ export const ApiService = {
 
       if (error) {
         console.error('Admin Fetch Error:', error);
-        return [];
+        throw new Error('Brak uprawnień do pobrania zgłoszeń.');
       }
 
       return requests.map(ApiService.mapResponse);
     },
 
     updateStatus: async (id: string, status: ServiceStatus, estimatedCost?: number): Promise<void> => {
-      const updateData: any = { status };
+      await requireAdmin();
+
+      const updateData: Record<string, unknown> = { status };
       if (estimatedCost !== undefined) {
         updateData.estimated_cost = estimatedCost;
       }
@@ -151,20 +166,20 @@ export const ApiService = {
         .eq('id', id);
 
       if (error) throw new Error('Nie udało się zaktualizować zgłoszenia');
-    }
+    },
   },
 
-  mapResponse: (row: any): ServiceRequest => ({
-    id: row.id,
-    userId: row.user_id,
-    createdAt: row.created_at,
-    componentModel: row.component_model,
-    problemDescription: row.problem_description,
+  mapResponse: (row: Record<string, unknown>): ServiceRequest => ({
+    id: row.id as string,
+    userId: row.user_id as string,
+    createdAt: row.created_at as string,
+    componentModel: row.component_model as string,
+    problemDescription: row.problem_description as string,
     deliveryMethod: row.delivery_method as DeliveryMethod,
-    preferredDate: row.preferred_date,
+    preferredDate: row.preferred_date as string,
     status: row.status as ServiceStatus,
-    estimatedCost: row.estimated_cost,
-    clientName: row.client_name,
-    clientPhone: row.client_phone
-  })
+    estimatedCost: row.estimated_cost as number | undefined,
+    clientName: row.client_name as string | undefined,
+    clientPhone: row.client_phone as string | undefined,
+  }),
 };

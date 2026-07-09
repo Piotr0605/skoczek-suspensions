@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { User, DeliveryMethod } from '../types';
 import { FULL_REGULATIONS, PRIVACY_POLICY } from '../constants';
 import { ApiService } from '../services/api';
+import { config } from '../config';
+import { sanitizeServiceRequest, validateServiceRequest } from '../utils/validation';
 import { Check, AlertCircle, Calendar, Truck, User as UserIcon } from 'lucide-react';
 import emailjs from '@emailjs/browser';
-
-// --- EMAILJS CONFIGURATION ---
-const EMAILJS_SERVICE_ID = 'service_kisfjge'; 
-const EMAILJS_TEMPLATE_ID: string = 'template_034dgd2';
-const EMAILJS_PUBLIC_KEY: string = 'QAmELeB9ozCGAw_oN';
 
 interface ServiceFormProps {
   user: User | null;
@@ -48,35 +45,49 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
       return;
     }
 
+    const validationError = validateServiceRequest(formData);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    const sanitized = sanitizeServiceRequest({
+      componentModel: formData.componentModel,
+      problemDescription: formData.problemDescription,
+      preferredDate: formData.preferredDate,
+      clientName: user.name,
+      clientPhone: user.phone,
+    });
+
     setIsSubmitting(true);
 
     try {
       // 1. Save to Database (Supabase)
-      await ApiService.requests.create(user.id, {
-        componentModel: formData.componentModel,
-        problemDescription: formData.problemDescription,
+      await ApiService.requests.create({
+        componentModel: sanitized.componentModel,
+        problemDescription: sanitized.problemDescription,
         deliveryMethod: formData.deliveryMethod,
-        preferredDate: formData.preferredDate,
-        clientName: user.name,
-        clientPhone: user.phone
+        preferredDate: sanitized.preferredDate,
+        clientName: sanitized.clientName,
+        clientPhone: sanitized.clientPhone,
       });
 
       // 2. Send Email Notification (EmailJS)
       try {
         await emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
+            config.emailjs.serviceId,
+            config.emailjs.templateId,
             {
-                to_name: "Oddaj Amora", // Zmieniono na nową nazwę
-                from_name: user.name,
+                to_name: "Oddaj Amora",
+                from_name: sanitized.clientName,
                 from_email: user.email,
-                from_phone: user.phone,
-                component_model: formData.componentModel,
-                problem_description: formData.problemDescription,
+                from_phone: sanitized.clientPhone,
+                component_model: sanitized.componentModel,
+                problem_description: sanitized.problemDescription,
                 delivery_method: formData.deliveryMethod,
-                preferred_date: formData.preferredDate
+                preferred_date: sanitized.preferredDate
             },
-            EMAILJS_PUBLIC_KEY
+            config.emailjs.publicKey
         );
       } catch (emailError) {
           console.error("Failed to send email notification:", emailError);

@@ -32,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const fetchRequests = async () => {
     setLoading(true);
     try {
-        const data = await ApiService.requests.getAllForUser(user.id);
+        const data = await ApiService.requests.getAllForUser();
         setRequests(data);
     } catch (e) {
         console.error("Failed to fetch requests", e);
