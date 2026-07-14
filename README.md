@@ -1,77 +1,77 @@
-# Oddaj Amora — Serwis Amortyzatorów
+# Oddaj Amora — Suspension Service
 
-Aplikacja webowa dla autoryzowanego punktu serwisowego amortyzatorów i damperów rowerowych **Oddaj Amora** (Galeria Rowerowa, Białystok). Umożliwia klientom składanie zgłoszeń serwisowych online, śledzenie statusu napraw oraz zarządzanie zleceniami przez personel serwisu.
+A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authorized bicycle suspension and damper service center. It allows customers to submit service requests online, track repair status, and lets service staff manage work orders.
 
-**Autor:** Piotr Sienkiewicz
-
----
-
-## Spis treści
-
-- [Funkcjonalności](#funkcjonalności)
-- [Stos technologiczny](#stos-technologiczny)
-- [Architektura](#architektura)
-- [Bezpieczeństwo](#bezpieczeństwo)
-- [Struktura projektu](#struktura-projektu)
-- [Wymagania](#wymagania)
-- [Instalacja i uruchomienie](#instalacja-i-uruchomienie)
-- [Konfiguracja](#konfiguracja)
-- [Wdrożenie produkcyjne](#wdrożenie-produkcyjne)
-- [Baza danych (Supabase)](#baza-danych-supabase)
-- [Role użytkowników](#role-użytkowników)
-- [Statusy zgłoszeń](#statusy-zgłoszeń)
-- [Skrypty npm](#skrypty-npm)
-- [Licencja](#licencja)
+**Author:** Piotr Sienkiewicz
 
 ---
 
-## Funkcjonalności
+## Table of Contents
 
-### Strona publiczna
-- **Strona główna** — prezentacja serwisu, informacje o marce i ofercie
-- **Cennik** — szczegółowy cennik usług (amortyzatory przednie, tylne/dampery, usługi dodatkowe) z podziałem na producentów (FOX, Rock Shox, Ohlins, Marzocchi i inne)
-- **Kontakt** — dane adresowe, telefon, e-mail, formularz szybkiego zapytania
-- **Regulamin** i **Polityka prywatności (RODO)**
-- **Mapa Google** — lokalizacja serwisu (wymaga akceptacji cookies)
-- **Baner cookies** — zgodność z RODO przy korzystaniu z map
-
-### Strefa klienta
-- Rejestracja i logowanie (Supabase Auth, hasło min. 8 znaków)
-- **Formularz zgłoszenia serwisowego** — model amortyzatora, opis usterki, sposób dostarczenia (osobiście / wysyłka), preferowany termin
-- **Panel klienta** — historia własnych zgłoszeń z aktualnym statusem naprawy
-- Powiadomienie e-mail do serwisu po złożeniu zgłoszenia (EmailJS)
-
-### Panel mechanika (administrator)
-- Przegląd wszystkich zgłoszeń serwisowych
-- Filtrowanie: bieżące, nowe, w trakcie, gotowe, historia
-- Aktualizacja statusu i wyceny (PLN)
-- Archiwizacja zakończonych zleceń
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Security](#security)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Installation and Running](#installation-and-running)
+- [Configuration](#configuration)
+- [Production Deployment](#production-deployment)
+- [Database (Supabase)](#database-supabase)
+- [User Roles](#user-roles)
+- [Request Statuses](#request-statuses)
+- [npm Scripts](#npm-scripts)
+- [License](#license)
 
 ---
 
-## Stos technologiczny
+## Features
 
-| Warstwa | Technologia |
-|---------|-------------|
+### Public Website
+- **Home page** — service presentation, brand and offer information
+- **Pricing** — detailed service price list (front forks, rear shocks/dampers, additional services) grouped by manufacturer (FOX, Rock Shox, Ohlins, Marzocchi, and others)
+- **Contact** — address, phone, email, quick inquiry form
+- **Terms of Service** and **Privacy Policy (GDPR)**
+- **Google Maps** — service location (requires cookie consent)
+- **Cookie banner** — GDPR compliance when using maps
+
+### Client Area
+- Registration and login (Supabase Auth, minimum 8-character password)
+- **Service request form** — suspension model, issue description, delivery method (in person / shipping), preferred date
+- **Client dashboard** — history of own requests with current repair status
+- Email notification to the service center after submitting a request (EmailJS)
+
+### Mechanic Panel (Administrator)
+- Overview of all service requests
+- Filtering: active, new, in progress, ready, history
+- Status and quote updates (PLN)
+- Archiving completed orders
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
 | Frontend | React 18, TypeScript |
 | Bundler | Vite 5 |
-| Stylowanie | Tailwind CSS (CDN) |
-| Ikony | Lucide React |
+| Styling | Tailwind CSS (CDN) |
+| Icons | Lucide React |
 | Backend / Auth | Supabase (PostgreSQL + Auth + RLS) |
-| E-mail | EmailJS |
-| Analityka | Vercel Analytics |
+| Email | EmailJS |
+| Analytics | Vercel Analytics |
 | Hosting | Vercel |
 
 ---
 
-## Architektura
+## Architecture
 
-Aplikacja jest **SPA** (Single Page Application) z nawigacją opartą na stanie widoku (`HOME`, `FORM`, `DASHBOARD`, `ADMIN`, `CONTACT`, `REGULATIONS`, `PRIVACY`).
+The application is a **SPA** (Single Page Application) with view-based navigation (`HOME`, `FORM`, `DASHBOARD`, `ADMIN`, `CONTACT`, `REGULATIONS`, `PRIVACY`).
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                        React (Vite)                          │
-│  App.tsx ──► komponenty UI + routing widoków                 │
+│  App.tsx ──► UI components + view routing                  │
 │       │                                                      │
 │       ▼                                                      │
 │  ApiService (api.ts)                                         │
@@ -81,146 +81,146 @@ Aplikacja jest **SPA** (Single Page Application) z nawigacją opartą na stanie 
 │                     updateStatus                             │
 │       │                                                      │
 │       ▼                                                      │
-│  config.ts ──► zmienne VITE_* (Supabase, EmailJS)            │
+│  config.ts ──► VITE_* variables (Supabase, EmailJS)          │
 │  supabaseClient.ts ──► Supabase Client                       │
 └──────────────────────────────────────────────────────────────┘
          │                                    │
          ▼                                    ▼
-   Supabase Auth                    Tabela service_requests
+   Supabase Auth                    service_requests table
    (app_metadata: role ADMIN)       + Row Level Security (RLS)
    (user_metadata: name, phone)
 ```
 
-Przepływ zgłoszenia serwisowego:
-1. Klient loguje się lub rejestruje
-2. Wypełnia formularz (z walidacją pól) i akceptuje regulamin oraz politykę prywatności
-3. Zgłoszenie zapisywane jest w Supabase z `user_id` z aktywnej sesji
-4. Wysyłane jest powiadomienie e-mail (EmailJS) do serwisu
-5. Klient śledzi status w panelu; mechanik aktualizuje zlecenie w panelu admina
+Service request flow:
+1. The client logs in or registers
+2. Fills out the form (with field validation) and accepts the terms and privacy policy
+3. The request is saved in Supabase with `user_id` from the active session
+4. An email notification is sent to the service center (EmailJS)
+5. The client tracks status in the dashboard; the mechanic updates the order in the admin panel
 
 ---
 
-## Bezpieczeństwo
+## Security
 
-Aplikacja stosuje wielowarstwową ochronę danych:
+The application uses multi-layer data protection:
 
-| Mechanizm | Opis |
-|-----------|------|
-| **Row Level Security (RLS)** | Polityki PostgreSQL w Supabase — klient widzi tylko swoje zgłoszenia, admin ma pełny dostęp |
-| **Rola w `app_metadata`** | Rola `ADMIN` przechowywana wyłącznie w `app_metadata` (niedostępna do edycji z przeglądarki) |
-| **Weryfikacja sesji** | Operacje na zgłoszeniach używają `auth.uid()` z sesji Supabase, nie parametru z klienta |
-| **`requireAdmin()`** | Warstwa API blokuje operacje administracyjne przed wysłaniem zapytania do bazy |
-| **Walidacja wejścia** | Limity długości pól formularza, minimalna długość hasła |
-| **Zmienne środowiskowe** | Klucze API w `VITE_*` env vars zamiast bezpośrednio w komponentach |
-| **Ogólne komunikaty błędów** | Rejestracja nie ujawnia szczegółów błędów serwera |
+| Mechanism | Description |
+|-----------|-------------|
+| **Row Level Security (RLS)** | PostgreSQL policies in Supabase — clients see only their own requests, admins have full access |
+| **Role in `app_metadata`** | The `ADMIN` role is stored only in `app_metadata` (not editable from the browser) |
+| **Session verification** | Request operations use `auth.uid()` from the Supabase session, not a client-supplied parameter |
+| **`requireAdmin()`** | API layer blocks admin operations before sending queries to the database |
+| **Input validation** | Form field length limits, minimum password length |
+| **Environment variables** | API keys in `VITE_*` env vars instead of hardcoded in components |
+| **Generic error messages** | Registration does not expose server error details |
 
-Migracja SQL z politykami RLS: `supabase/migrations/001_security_rls.sql`
+SQL migration with RLS policies: `supabase/migrations/001_security_rls.sql`
 
-Szczegółowa instrukcja wdrożenia: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
+Detailed deployment guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
 ---
 
-## Struktura projektu
+## Project Structure
 
 ```
 skoczek-suspensions/
-├── index.html                  # Punkt wejścia HTML, konfiguracja Tailwind
+├── index.html                  # HTML entry point, Tailwind config
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
-├── .env.example                # Szablon zmiennych środowiskowych
+├── .env.example                # Environment variables template
 ├── .gitignore
-├── DEPLOY_SECURITY.md          # Instrukcja wdrożenia poprawek bezpieczeństwa
+├── DEPLOY_SECURITY.md          # Security deployment guide
 ├── supabase/
 │   └── migrations/
-│       └── 001_security_rls.sql  # RLS + migracja roli ADMIN
+│       └── 001_security_rls.sql  # RLS + ADMIN role migration
 └── src/
-    ├── index.tsx               # Montowanie aplikacji React
-    ├── vite-env.d.ts           # Typy zmiennych VITE_*
-    ├── config.ts               # Konfiguracja Supabase i EmailJS
-    ├── App.tsx                 # Główny komponent, nawigacja, layout
-    ├── types.ts                # Typy TypeScript (User, ServiceRequest, enums)
-    ├── constants.ts            # Dane kontaktowe, cennik, regulamin, RODO
+    ├── index.tsx               # React app mount
+    ├── vite-env.d.ts           # VITE_* variable types
+    ├── config.ts               # Supabase and EmailJS configuration
+    ├── App.tsx                 # Main component, navigation, layout
+    ├── types.ts                # TypeScript types (User, ServiceRequest, enums)
+    ├── constants.ts            # Contact info, pricing, terms, privacy policy
     ├── utils/
-    │   ├── auth.ts             # Odczyt roli z app_metadata
-    │   └── validation.ts       # Walidacja formularzy i haseł
+    │   ├── auth.ts             # Role lookup from app_metadata
+    │   └── validation.ts       # Form and password validation
     ├── components/
-    │   ├── ServiceForm.tsx     # Formularz zgłoszenia serwisowego
-    │   ├── Dashboard.tsx       # Panel klienta
-    │   ├── AdminDashboard.tsx  # Panel mechanika
-    │   └── CookieBanner.tsx    # Baner zgody na cookies
+    │   ├── ServiceForm.tsx     # Service request form
+    │   ├── Dashboard.tsx       # Client dashboard
+    │   ├── AdminDashboard.tsx  # Mechanic/admin dashboard
+    │   └── CookieBanner.tsx    # Cookie consent banner
     └── services/
-        ├── supabaseClient.ts   # Klient Supabase
-        └── api.ts              # Warstwa API (auth + zgłoszenia)
+        ├── supabaseClient.ts   # Supabase client
+        └── api.ts              # API layer (auth + requests)
 ```
 
 ---
 
-## Wymagania
+## Requirements
 
-- **Node.js** 18 lub nowszy
-- **npm** (lub yarn / pnpm)
-- Konto **Supabase** z skonfigurowaną bazą, autentykacją i uruchomioną migracją RLS
-- Konto **EmailJS** (do powiadomień e-mail o nowych zgłoszeniach)
-- Konto **Vercel** (hosting produkcyjny)
+- **Node.js** 18 or newer
+- **npm** (or yarn / pnpm)
+- **Supabase** account with configured database, authentication, and RLS migration applied
+- **EmailJS** account (for email notifications about new requests)
+- **Vercel** account (production hosting)
 
 ---
 
-## Instalacja i uruchomienie
+## Installation and Running
 
 ```bash
-# Klonowanie repozytorium
+# Clone the repository
 git clone https://github.com/Piotr0605/skoczek-suspensions.git
 cd skoczek-suspensions
 
-# Instalacja zależności
+# Install dependencies
 npm install
 
-# Konfiguracja zmiennych środowiskowych (opcjonalnie lokalnie)
+# Configure environment variables (optional for local dev)
 cp .env.example .env.local
-# Uzupełnij wartości w .env.local
+# Fill in values in .env.local
 
-# Uruchomienie serwera deweloperskiego
+# Start the development server
 npm run dev
 ```
 
-Aplikacja domyślnie dostępna pod adresem `http://localhost:5173`.
+The app is available by default at `http://localhost:5173`.
 
 ```bash
-# Budowanie wersji produkcyjnej
+# Build for production
 npm run build
 
-# Podgląd buildu produkcyjnego
+# Preview the production build
 npm run preview
 ```
 
 ---
 
-## Konfiguracja
+## Configuration
 
-Konfiguracja odbywa się przez zmienne środowiskowe z prefiksem `VITE_` (plik `.env.local` lokalnie, **Environment Variables** na Vercel).
+Configuration is done via environment variables with the `VITE_` prefix (`.env.local` locally, **Environment Variables** on Vercel).
 
-| Zmienna | Opis |
-|---------|------|
-| `VITE_SUPABASE_URL` | URL projektu Supabase |
-| `VITE_SUPABASE_ANON_KEY` | Klucz publiczny (anon) |
-| `VITE_EMAILJS_SERVICE_ID` | ID serwisu EmailJS |
-| `VITE_EMAILJS_TEMPLATE_ID` | ID szablonu e-mail |
-| `VITE_EMAILJS_PUBLIC_KEY` | Klucz publiczny EmailJS |
+| Variable | Description |
+|----------|-------------|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Public (anon) key |
+| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID |
+| `VITE_EMAILJS_TEMPLATE_ID` | Email template ID |
+| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key |
 
-Wartości ładowane są w `src/config.ts`. Przy braku zmiennych środowiskowych używane są fallbacki — zapewnia to kompatybilność z dotychczasowym deployem, ale **zalecane jest ustawienie env vars na Vercel**.
+Values are loaded in `src/config.ts`. If environment variables are missing, fallbacks are used — this preserves compatibility with the existing deployment, but **setting env vars on Vercel is recommended**.
 
-Szablon e-mail EmailJS powinien zawierać pola: `from_name`, `from_email`, `from_phone`, `component_model`, `problem_description`, `delivery_method`, `preferred_date`.
+The EmailJS template should include these fields: `from_name`, `from_email`, `from_phone`, `component_model`, `problem_description`, `delivery_method`, `preferred_date`.
 
-### Rola administratora
+### Administrator Role
 
-Nowi użytkownicy otrzymują domyślnie rolę `CLIENT`. Rolę `ADMIN` nadaje się **wyłącznie** w panelu Supabase, w polu **App Metadata**:
+New users receive the `CLIENT` role by default. The `ADMIN` role is assigned **only** in the Supabase dashboard, in **App Metadata**:
 
 ```json
 { "role": "ADMIN" }
 ```
 
-Alternatywnie przez SQL Editor:
+Alternatively, via the SQL Editor:
 
 ```sql
 UPDATE auth.users
@@ -231,96 +231,96 @@ WHERE email = 'admin@example.com';
 
 ---
 
-## Wdrożenie produkcyjne
+## Production Deployment
 
-Aplikacja jest hostowana na **Vercel** i automatycznie buduje się po `git push` na gałąź `main`.
+The application is hosted on **Vercel** and builds automatically on `git push` to the `main` branch.
 
-### Kolejność wdrożenia (ważne)
+### Deployment Order (Important)
 
-1. **Supabase** — uruchom `supabase/migrations/001_security_rls.sql` w SQL Editor
-2. **Sprawdź** — konto admina ma `"role": "ADMIN"` w App Metadata
-3. **Vercel** — ustaw zmienne `VITE_*` (opcjonalnie, ale zalecane)
+1. **Supabase** — run `supabase/migrations/001_security_rls.sql` in the SQL Editor
+2. **Verify** — the admin account has `"role": "ADMIN"` in App Metadata
+3. **Vercel** — set `VITE_*` variables (optional but recommended)
 4. **Deploy** — `git push origin main`
 
-Pełna instrukcja krok po kroku: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
+Full step-by-step guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
-### Checklist po wdrożeniu
+### Post-Deployment Checklist
 
-- [ ] Strona główna, cennik, kontakt działają poprawnie
-- [ ] Rejestracja i logowanie klienta
-- [ ] Złożenie zgłoszenia serwisowego
-- [ ] Panel klienta pokazuje tylko własne zgłoszenia
-- [ ] Panel mechanika — pełna lista i edycja statusów
-- [ ] Zwykły klient nie ma dostępu do panelu mechanika
+- [ ] Home page, pricing, and contact work correctly
+- [ ] Client registration and login
+- [ ] Service request submission
+- [ ] Client dashboard shows only own requests
+- [ ] Mechanic panel — full list and status editing
+- [ ] Regular clients cannot access the mechanic panel
 
 ---
 
-## Baza danych (Supabase)
+## Database (Supabase)
 
-### Tabela `service_requests`
+### `service_requests` Table
 
-| Kolumna | Typ | Opis |
-|---------|-----|------|
-| `id` | uuid | Klucz główny |
-| `user_id` | uuid | ID użytkownika (FK do auth.users) |
-| `component_model` | text | Model amortyzatora / dampera |
-| `problem_description` | text | Opis usterki |
-| `delivery_method` | text | `Osobisty` lub `Wysyłka` |
-| `preferred_date` | date | Preferowany termin |
-| `client_name` | text | Imię i nazwisko klienta |
-| `client_phone` | text | Telefon kontaktowy |
-| `status` | text | Status zgłoszenia (patrz poniżej) |
-| `estimated_cost` | numeric | Szacunkowa wycena (PLN) |
-| `created_at` | timestamptz | Data utworzenia |
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | uuid | Primary key |
+| `user_id` | uuid | User ID (FK to auth.users) |
+| `component_model` | text | Suspension / damper model |
+| `problem_description` | text | Issue description |
+| `delivery_method` | text | `Osobisty` (in person) or `Wysyłka` (shipping) |
+| `preferred_date` | date | Preferred date |
+| `client_name` | text | Client full name |
+| `client_phone` | text | Contact phone |
+| `status` | text | Request status (see below) |
+| `estimated_cost` | numeric | Estimated quote (PLN) |
+| `created_at` | timestamptz | Creation timestamp |
 
 ### Row Level Security (RLS)
 
-Po uruchomieniu migracji `001_security_rls.sql` obowiązują polityki:
+After running the `001_security_rls.sql` migration, these policies apply:
 
-| Operacja | Klient (`CLIENT`) | Administrator (`ADMIN`) |
-|----------|-------------------|-------------------------|
-| SELECT własnych zgłoszeń | Tak | Tak |
-| SELECT wszystkich zgłoszeń | Nie | Tak |
-| INSERT (własne zgłoszenie) | Tak | Tak |
-| UPDATE statusu / wyceny | Nie | Tak |
-| DELETE | Nie | Tak |
+| Operation | Client (`CLIENT`) | Administrator (`ADMIN`) |
+|-----------|-------------------|-------------------------|
+| SELECT own requests | Yes | Yes |
+| SELECT all requests | No | Yes |
+| INSERT (own request) | Yes | Yes |
+| UPDATE status / quote | No | Yes |
+| DELETE | No | Yes |
 
-Funkcja `is_admin()` sprawdza rolę wyłącznie w `app_metadata` JWT.
+The `is_admin()` function checks the role exclusively in the JWT `app_metadata`.
 
 ---
 
-## Role użytkowników
+## User Roles
 
-| Rola | Źródło | Uprawnienia |
+| Role | Source | Permissions |
 |------|--------|-------------|
-| `CLIENT` | Domyślna przy rejestracji | Składanie zgłoszeń, podgląd własnej historii napraw |
-| `ADMIN` | `app_metadata` w Supabase | Pełny dostęp do panelu mechanika, edycja statusów i wycen |
+| `CLIENT` | Default on registration | Submit requests, view own repair history |
+| `ADMIN` | `app_metadata` in Supabase | Full access to the mechanic panel, edit statuses and quotes |
 
 ---
 
-## Statusy zgłoszeń
+## Request Statuses
 
-| Status | Opis |
-|--------|------|
-| Oczekuje na przyjęcie | Nowe zgłoszenie |
-| Przyjęty na serwis | Sprzęt przyjęty do serwisu |
-| W trakcie naprawy | Trwa realizacja |
-| Oczekiwanie na części | Wstrzymane — brak części |
-| Gotowy do odbioru | Naprawa zakończona |
-| Zakończony | Zlecenie zarchiwizowane |
-
----
-
-## Skrypty npm
-
-| Polecenie | Opis |
-|-----------|------|
-| `npm run dev` | Serwer deweloperski Vite |
-| `npm run build` | Kompilacja do katalogu `dist/` |
-| `npm run preview` | Lokalny podgląd wersji produkcyjnej |
+| Status (PL) | Description |
+|-------------|-------------|
+| Oczekuje na przyjęcie | New request |
+| Przyjęty na serwis | Equipment received for service |
+| W trakcie naprawy | Repair in progress |
+| Oczekiwanie na części | On hold — waiting for parts |
+| Gotowy do odbioru | Ready for pickup |
+| Zakończony | Order archived |
 
 ---
 
-## Licencja
+## npm Scripts
 
-Projekt prywatny — Galeria Rowerowa Sp. z o.o. / Oddaj Amora.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Vite development server |
+| `npm run build` | Build to `dist/` |
+| `npm run preview` | Local preview of the production build |
+
+---
+
+## License
+
+Private project — Galeria Rowerowa Sp. z o.o. / Oddaj Amora.

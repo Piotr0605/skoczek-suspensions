@@ -1,84 +1,84 @@
-# Wdrożenie poprawek bezpieczeństwa (bez przestoju)
+# Security Fixes Deployment (Zero Downtime)
 
-## Kolejność — bardzo ważna
+## Order — Very Important
 
-Aby strona nie przestała działać i panel mechanika nie zniknął:
+To keep the site running and the mechanic panel accessible:
 
-### 1. Supabase SQL (najpierw!)
+### 1. Supabase SQL (First!)
 
-1. Wejdź w [Supabase Dashboard](https://supabase.com/dashboard) → swój projekt
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project
 2. **SQL Editor** → **New query**
-3. Skopiuj całą zawartość pliku `supabase/migrations/001_security_rls.sql`
-4. Kliknij **Run**
+3. Copy the entire contents of `supabase/migrations/001_security_rls.sql`
+4. Click **Run**
 
-To:
-- przeniesie rolę `ADMIN` do `app_metadata` (bezpieczne, nieedytowalne przez klienta),
-- włączy RLS na tabeli `service_requests`,
-- ustawi polityki dostępu (klient → swoje dane, admin → wszystko).
+This will:
+- move the `ADMIN` role to `app_metadata` (secure, not editable by the client),
+- enable RLS on the `service_requests` table,
+- set access policies (client → own data, admin → everything).
 
-### 2. Sprawdź administratora
+### 2. Verify the Administrator
 
-W Supabase → **Authentication** → **Users** → wybierz konto admina.
+In Supabase → **Authentication** → **Users** → select the admin account.
 
-W **App Metadata** powinno być:
+**App Metadata** should contain:
 ```json
 { "role": "ADMIN" }
 ```
 
-Jeśli nie ma — uruchom w SQL Editor:
+If missing — run in the SQL Editor:
 ```sql
 UPDATE auth.users
 SET raw_app_meta_data =
   COALESCE(raw_app_meta_data, '{}'::jsonb) || jsonb_build_object('role', 'ADMIN')
-WHERE email = 'TWOJ-EMAIL-ADMINA@example.com';
+WHERE email = 'YOUR-ADMIN-EMAIL@example.com';
 ```
 
-### 3. Deploy frontendu (Vercel)
+### 3. Deploy Frontend (Vercel)
 
 ```bash
 git add .
-git commit -m "Poprawki bezpieczeństwa: RLS, app_metadata, walidacja"
+git commit -m "Security fixes: RLS, app_metadata, validation"
 git push origin main
 ```
 
-Vercel zbuduje i wdroży automatycznie. Strona publiczna (landing, cennik, kontakt) działa bez zmian.
+Vercel will build and deploy automatically. The public site (landing, pricing, contact) works unchanged.
 
-### 4. Opcjonalnie — zmienne środowiskowe na Vercel
+### 4. Optional — Environment Variables on Vercel
 
-**Settings → Environment Variables** (dla Production):
+**Settings → Environment Variables** (for Production):
 
-| Zmienna | Wartość |
-|---------|---------|
-| `VITE_SUPABASE_URL` | URL projektu Supabase |
+| Variable | Value |
+|----------|-------|
+| `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Anon key |
 | `VITE_EMAILJS_SERVICE_ID` | service_... |
 | `VITE_EMAILJS_TEMPLATE_ID` | template_... |
-| `VITE_EMAILJS_PUBLIC_KEY` | klucz publiczny |
+| `VITE_EMAILJS_PUBLIC_KEY` | public key |
 
-Bez tych zmiennych aplikacja używa fallbacków — działa jak dotychczas.
+Without these variables the app uses fallbacks — it works as before.
 
-### 5. Test po wdrożeniu
+### 5. Post-Deployment Test
 
-- [ ] Strona główna, cennik, kontakt — bez zmian
-- [ ] Rejestracja i logowanie klienta
-- [ ] Złożenie zgłoszenia serwisowego
-- [ ] Panel klienta — widać tylko własne zgłoszenia
-- [ ] Panel mechanika — pełna lista i edycja statusów
-- [ ] Zwykły klient **nie** widzi panelu mechanika
+- [ ] Home page, pricing, contact — unchanged
+- [ ] Client registration and login
+- [ ] Service request submission
+- [ ] Client dashboard — only own requests visible
+- [ ] Mechanic panel — full list and status editing
+- [ ] Regular client **cannot** see the mechanic panel
 
-## Co zostało naprawione
+## What Was Fixed
 
-| Problem | Rozwiązanie |
-|---------|-------------|
-| Brak RLS | Polityki SQL w Supabase |
-| Rola ADMIN w user_metadata | Przeniesiona do app_metadata |
-| Autoryzacja tylko w UI | `requireAdmin()` w API + RLS |
-| userId z parametru | Sesja użytkownika z Supabase Auth |
-| Klucze w kodzie | `config.ts` + env vars (fallback) |
-| Brak walidacji | Limity długości pól, min. 8 znaków hasła |
-| Wyciek błędów rejestracji | Ogólne komunikaty |
+| Issue | Solution |
+|-------|----------|
+| Missing RLS | SQL policies in Supabase |
+| ADMIN role in user_metadata | Moved to app_metadata |
+| Authorization only in UI | `requireAdmin()` in API + RLS |
+| userId from parameter | User session from Supabase Auth |
+| Keys in source code | `config.ts` + env vars (fallback) |
+| Missing validation | Field length limits, min. 8 character password |
+| Registration error leakage | Generic error messages |
 
-## Uwaga o EmailJS
+## Note on EmailJS
 
-Klucze EmailJS nadal działają z przeglądarki (ograniczenie architektury SPA).
-Docelowo warto przenieść wysyłkę maili na Supabase Edge Function.
+EmailJS keys still work from the browser (SPA architecture limitation).
+Consider moving email sending to a Supabase Edge Function in the future.

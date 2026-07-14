@@ -66,7 +66,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Szybka archiwizacja (ustawienie statusu na COMPLETED)
+  // Quick archive (set status to COMPLETED)
   const archiveRequest = async (id: string) => {
       if (!window.confirm("Czy na pewno chcesz zakończyć to zlecenie i przenieść je do historii?")) return;
       try {
@@ -77,13 +77,13 @@ const AdminDashboard: React.FC = () => {
       }
   };
 
-  // Logika filtrowania
+  // Filter logic
   const filteredRequests = requests.filter(r => {
       if (filterStatus === 'HISTORY') {
           return r.status === ServiceStatus.COMPLETED;
       }
       if (filterStatus === 'ALL') {
-          // W widoku "Wszystkie" pokazujemy wszystko OPRÓCZ zakończonych (bo one są w historii)
+          // In the "All" view, show everything EXCEPT completed (those are in history)
           return r.status !== ServiceStatus.COMPLETED;
       }
       return r.status === filterStatus;

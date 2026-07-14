@@ -1,14 +1,14 @@
 -- =============================================================================
--- MIGRACJA BEZPIECZEŃSTWA — Oddaj Amora / skoczek-suspensions
+-- SECURITY MIGRATION — Oddaj Amora / skoczek-suspensions
 -- =============================================================================
--- WAŻNE: Uruchom ten skrypt w Supabase SQL Editor PRZED wdrożeniem nowego kodu.
--- Kolejność: 1) Ten SQL  2) Deploy frontendu na Vercel
+-- IMPORTANT: Run this script in the Supabase SQL Editor BEFORE deploying new code.
+-- Order: 1) This SQL  2) Deploy frontend to Vercel
 --
--- Panel: Supabase → SQL Editor → New query → wklej i Run
+-- Panel: Supabase → SQL Editor → New query → paste and Run
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- KROK 1: Przenieś rolę ADMIN do app_metadata (tylko serwer może to ustawić)
+-- STEP 1: Move ADMIN role to app_metadata (only the server can set it)
 -- -----------------------------------------------------------------------------
 UPDATE auth.users
 SET raw_app_meta_data =
@@ -16,13 +16,13 @@ SET raw_app_meta_data =
 WHERE COALESCE(raw_user_meta_data->>'role', '') = 'ADMIN'
   AND COALESCE(raw_app_meta_data->>'role', '') IS DISTINCT FROM 'ADMIN';
 
--- Usuń rolę z user_metadata, żeby użytkownik nie mógł jej sam nadpisać
+-- Remove role from user_metadata so users cannot override it themselves
 UPDATE auth.users
 SET raw_user_meta_data = raw_user_meta_data - 'role'
 WHERE raw_user_meta_data ? 'role';
 
 -- -----------------------------------------------------------------------------
--- KROK 2: Funkcja pomocnicza — sprawdzenie roli admina (tylko app_metadata)
+-- STEP 2: Helper function — check admin role (app_metadata only)
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
@@ -38,11 +38,11 @@ AS $$
 $$;
 
 -- -----------------------------------------------------------------------------
--- KROK 3: Włącz Row Level Security na tabeli service_requests
+-- STEP 3: Enable Row Level Security on service_requests table
 -- -----------------------------------------------------------------------------
 ALTER TABLE public.service_requests ENABLE ROW LEVEL SECURITY;
 
--- Usuń stare polityki (bezpieczne ponowne uruchomienie)
+-- Drop old policies (safe to re-run)
 DROP POLICY IF EXISTS "Users read own requests" ON public.service_requests;
 DROP POLICY IF EXISTS "Admins read all requests" ON public.service_requests;
 DROP POLICY IF EXISTS "Users insert own requests" ON public.service_requests;
@@ -50,31 +50,31 @@ DROP POLICY IF EXISTS "Admins update requests" ON public.service_requests;
 DROP POLICY IF EXISTS "Admins delete requests" ON public.service_requests;
 
 -- -----------------------------------------------------------------------------
--- KROK 4: Polityki RLS
+-- STEP 4: RLS policies
 -- -----------------------------------------------------------------------------
 
--- Klient widzi tylko swoje zgłoszenia
+-- Clients can only see their own requests
 CREATE POLICY "Users read own requests"
 ON public.service_requests
 FOR SELECT
 TO authenticated
 USING (auth.uid() = user_id);
 
--- Administrator widzi wszystkie zgłoszenia
+-- Administrators can see all requests
 CREATE POLICY "Admins read all requests"
 ON public.service_requests
 FOR SELECT
 TO authenticated
 USING (public.is_admin());
 
--- Klient może tworzyć zgłoszenia tylko na swoje konto
+-- Clients can only create requests for their own account
 CREATE POLICY "Users insert own requests"
 ON public.service_requests
 FOR INSERT
 TO authenticated
 WITH CHECK (auth.uid() = user_id);
 
--- Tylko administrator może aktualizować zgłoszenia
+-- Only administrators can update requests
 CREATE POLICY "Admins update requests"
 ON public.service_requests
 FOR UPDATE
@@ -82,7 +82,7 @@ TO authenticated
 USING (public.is_admin())
 WITH CHECK (public.is_admin());
 
--- Opcjonalnie: tylko admin może usuwać (jeśli potrzebne w przyszłości)
+-- Optional: only admins can delete (if needed in the future)
 CREATE POLICY "Admins delete requests"
 ON public.service_requests
 FOR DELETE
@@ -90,9 +90,9 @@ TO authenticated
 USING (public.is_admin());
 
 -- -----------------------------------------------------------------------------
--- KROK 5: Nadanie roli ADMIN nowemu administratorowi (ręcznie, gdy potrzeba)
+-- STEP 5: Grant ADMIN role to a new administrator (manually, when needed)
 -- -----------------------------------------------------------------------------
--- Zamień 'admin@example.com' na email administratora:
+-- Replace 'admin@example.com' with the administrator's email:
 --
 -- UPDATE auth.users
 -- SET raw_app_meta_data =

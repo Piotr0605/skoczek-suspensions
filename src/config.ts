@@ -1,7 +1,7 @@
 /**
- * Konfiguracja z zmiennych środowiskowych.
- * Fallbacki zachowują kompatybilność z dotychczasowym deployem na Vercel.
- * Zalecane: ustaw VITE_* w Environment Variables i usuń fallbacki po migracji.
+ * Configuration from environment variables.
+ * Fallbacks preserve compatibility with the existing Vercel deployment.
+ * Recommended: set VITE_* in Environment Variables and remove fallbacks after migration.
  */
 export const config = {
   supabase: {
