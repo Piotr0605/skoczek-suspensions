@@ -18,13 +18,13 @@ const SuspensionLogo: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden="true">
     <g transform="translate(50, 50) rotate(-45) translate(-50, -50)">
       <rect x="42" y="10" width="16" height="22" fill="currentColor" />
-      <circle cx="50" cy="12" r="5" fill="#f3efe6" stroke="currentColor" strokeWidth="3"/>
+      <circle cx="50" cy="12" r="5" fill="#f4ecdc" stroke="currentColor" strokeWidth="3"/>
       <rect x="62" y="15" width="14" height="35" fill="currentColor" />
       <rect x="46" y="30" width="8" height="50" fill="currentColor" opacity="0.35"/>
       <path d="M40 36 L60 41.5 L40 47 L60 52.5 L40 58 L60 63.5 L40 69 L60 74.5"
             stroke="currentColor" strokeWidth="5" strokeLinecap="square" strokeLinejoin="miter" />
       <rect x="44" y="80" width="12" height="12" fill="currentColor" />
-      <circle cx="50" cy="90" r="5" fill="#f3efe6" stroke="currentColor" strokeWidth="3"/>
+      <circle cx="50" cy="90" r="5" fill="#f4ecdc" stroke="currentColor" strokeWidth="3"/>
     </g>
   </svg>
 );
@@ -178,7 +178,8 @@ const PricingSection = () => {
   const tabLabel = (id: string) => id === 'FRONT' ? 'Przód' : id === 'REAR' ? 'Tył' : 'Inne';
 
   return (
-    <section id="cennik" className="scroll-mt-24 border-t border-skoczek-line py-14">
+    <section id="cennik" className="scroll-mt-24 py-14">
+      <div className="perf mx-auto mb-10 max-w-5xl" aria-hidden="true" />
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="font-display text-4xl text-skoczek-ink">Cennik</h2>
         <p className="mt-2 text-skoczek-muted">Stawki w złotych. Serwis i wersja z uszczelkami, jeśli jest w karcie.</p>
@@ -336,8 +337,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`flex min-h-screen flex-col bg-skoczek-paper font-sans text-skoczek-ink ${cookieConsent ? '' : 'pb-24'}`}>
-      <div className="border-b border-skoczek-line">
+    <div className={`flex min-h-screen flex-col font-sans text-skoczek-ink ${cookieConsent ? '' : 'pb-24'}`}>
+      <div className="border-b border-skoczek-line bg-skoczek-paper">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 font-mono text-xs text-skoczek-muted">
           <span>{ADDRESS}</span>
           <span>{HOURS}</span>
@@ -345,7 +346,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <nav className="sticky top-0 z-40 border-b border-skoczek-line bg-skoczek-paper">
+      <nav className="sticky top-0 z-40 border-b border-skoczek-ink/15 bg-skoczek-paper">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <button onClick={() => go('HOME')} className="flex items-center gap-3 text-left">
             <SuspensionLogo className="h-10 w-10 text-skoczek-ink" />
@@ -395,26 +396,46 @@ const App: React.FC = () => {
       <main className="flex-grow">
         {view === 'HOME' && (
           <>
-            <section className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <p className="font-mono text-xs uppercase tracking-wide text-skoczek-muted">Serwis zawieszenia · Białystok</p>
-              <h1 className="mt-3 max-w-xl font-display text-5xl leading-tight text-skoczek-ink md:text-6xl">Oddaj Amora</h1>
-              <p className="mt-4 max-w-xl text-lg text-skoczek-muted">
-                Warsztat widelców i damperów w Galerii Rowerowej. Przegląd, naprawa i ustawienie.
-              </p>
-              <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-skoczek-ink">
-                {BRANDS.map((brand) => <li key={brand}>{brand}</li>)}
-              </ul>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button onClick={() => go('FORM')} className="bg-skoczek-primary px-5 py-3 text-center font-semibold text-white hover:bg-skoczek-primaryHover">
-                  Zleć naprawę
-                </button>
-                <a href="#cennik" className="px-2 py-3 text-center font-semibold text-skoczek-ink underline underline-offset-4">
-                  Cennik
-                </a>
+            <section className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-12 md:grid-cols-[1fr_260px] md:py-16">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wide text-skoczek-muted">Serwis zawieszenia · Białystok</p>
+                <h1 className="mt-3 max-w-xl font-display text-5xl leading-tight text-skoczek-ink md:text-6xl">Oddaj Amora</h1>
+                <p className="mt-4 max-w-xl text-lg text-skoczek-muted">
+                  Warsztat widelców i damperów w Galerii Rowerowej. Przegląd, naprawa i ustawienie.
+                </p>
+                <ul className="mt-6 flex flex-wrap gap-2 font-mono text-sm text-skoczek-ink">
+                  {BRANDS.map((brand) => (
+                    <li key={brand} className="border border-dashed border-skoczek-ink/40 bg-skoczek-card/70 px-2 py-1">{brand}</li>
+                  ))}
+                </ul>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <button onClick={() => go('FORM')} className="bg-skoczek-primary px-5 py-3 text-center font-semibold text-white hover:bg-skoczek-primaryHover">
+                    Zleć naprawę
+                  </button>
+                  <a href="#cennik" className="px-2 py-3 text-center font-semibold text-skoczek-ink underline underline-offset-4">
+                    Cennik
+                  </a>
+                </div>
+                <p className="mt-6 max-w-xl text-sm text-skoczek-muted">
+                  Gwarancja 12 miesięcy na usługę. Sprzęt można przywieźć osobiście albo wysłać.
+                </p>
               </div>
-              <p className="mt-6 max-w-xl text-sm text-skoczek-muted">
-                Gwarancja 12 miesięcy na usługę. Sprzęt można przywieźć osobiście albo wysłać.
-              </p>
+              <aside className="relative border border-skoczek-ink bg-skoczek-card/85 p-5">
+                <div className="absolute -left-1 -top-1 h-3 w-3 border-l-2 border-t-2 border-skoczek-primary" />
+                <div className="absolute -bottom-1 -right-1 h-3 w-3 border-b-2 border-r-2 border-skoczek-primary" />
+                <p className="font-mono text-[11px] tracking-wide text-skoczek-muted">KARTA SERWISOWA · 014</p>
+                <svg viewBox="0 0 120 200" className="mx-auto mt-2 h-44 w-24 text-skoczek-ink" aria-hidden="true">
+                  <circle cx="60" cy="16" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path d="M60 23 V40" stroke="currentColor" strokeWidth="2" />
+                  <path d="M38 46h44M34 62h52M32 78h56M34 94h52M38 110h44" fill="none" stroke="currentColor" strokeWidth="2.4" />
+                  <path d="M60 40c18 6 18 10 0 16s-18 10 0 16 18 10 0 16-18 10 0 16 18 10 0 16" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path d="M60 120 V150" stroke="currentColor" strokeWidth="6" />
+                  <circle cx="60" cy="168" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                <div className="stamp mx-auto mt-1 text-sm">
+                  <span>serwis<br />12 mies.<br />Białystok</span>
+                </div>
+              </aside>
             </section>
 
             <PricingSection />
@@ -527,7 +548,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="mt-auto border-t border-skoczek-line">
+      <footer className="mt-auto border-t border-skoczek-line bg-skoczek-paper/90">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="font-display text-2xl">Oddaj Amora</p>
