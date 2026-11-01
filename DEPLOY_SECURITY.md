@@ -51,11 +51,8 @@ Vercel will build and deploy automatically. The public site (landing, pricing, c
 |----------|-------|
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Anon key |
-| `VITE_EMAILJS_SERVICE_ID` | service_... |
-| `VITE_EMAILJS_TEMPLATE_ID` | template_... |
-| `VITE_EMAILJS_PUBLIC_KEY` | public key |
 
-Without these variables the app uses fallbacks — it works as before.
+Without these variables the app uses fallbacks. EmailJS is no longer used.
 
 ### 5. Post-Deployment Test
 
@@ -78,7 +75,6 @@ Without these variables the app uses fallbacks — it works as before.
 | Missing validation | Field length limits, min. 8 character password |
 | Registration error leakage | Generic error messages |
 
-## Note on EmailJS
+## Note on notifications
 
-EmailJS keys still work from the browser (SPA architecture limitation).
-Consider moving email sending to a Supabase Edge Function in the future.
+The shop is not emailed when someone submits a form. Service requests and contact questions are stored in Supabase and read in the mechanic panel. Run `supabase/migrations/002_contact_details.sql` in the SQL Editor so `client_email` and `contact_inquiries` exist.

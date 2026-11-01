@@ -1,6 +1,6 @@
 
 import { supabase } from './supabaseClient';
-import { User, ServiceRequest, ServiceStatus, UserRole, DeliveryMethod } from '../types';
+import { User, ServiceRequest, ServiceStatus, UserRole, DeliveryMethod, ContactInquiry } from '../types';
 import { getUserRole } from '../utils/auth';
 
 function mapAuthUser(authUser: {
@@ -106,6 +106,7 @@ export const ApiService = {
           preferred_date: data.preferredDate,
           client_name: data.clientName,
           client_phone: data.clientPhone,
+          client_email: session.user.email ?? '',
           status: ServiceStatus.PENDING,
         })
         .select()
@@ -169,6 +170,59 @@ export const ApiService = {
     },
   },
 
+  inquiries: {
+    create: async (data: {
+      name: string;
+      email: string;
+      subject: string;
+      message: string;
+    }): Promise<void> => {
+      const name = data.name.trim().slice(0, 100);
+      const email = data.email.trim().slice(0, 200);
+      const subject = data.subject.trim().slice(0, 200);
+      const message = data.message.trim().slice(0, 2000);
+
+      if (!name || !email || !subject || !message) {
+        throw new Error('Uzupełnij wszystkie pola zapytania.');
+      }
+
+      const { error } = await supabase.from('contact_inquiries').insert({
+        name,
+        email,
+        subject,
+        message,
+      });
+
+      if (error) {
+        console.error('Inquiry Error:', error);
+        throw new Error('Nie udało się zapisać zapytania.');
+      }
+    },
+
+    getAll: async (): Promise<ContactInquiry[]> => {
+      await requireAdmin();
+
+      const { data, error } = await supabase
+        .from('contact_inquiries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Inquiry Fetch Error:', error);
+        throw new Error('Nie udało się pobrać zapytań.');
+      }
+
+      return data.map((row) => ({
+        id: row.id as string,
+        createdAt: row.created_at as string,
+        name: row.name as string,
+        email: row.email as string,
+        subject: row.subject as string,
+        message: row.message as string,
+      }));
+    },
+  },
+
   mapResponse: (row: Record<string, unknown>): ServiceRequest => ({
     id: row.id as string,
     userId: row.user_id as string,
@@ -181,5 +235,6 @@ export const ApiService = {
     estimatedCost: row.estimated_cost as number | undefined,
     clientName: row.client_name as string | undefined,
     clientPhone: row.client_phone as string | undefined,
+    clientEmail: row.client_email as string | undefined,
   }),
 };
