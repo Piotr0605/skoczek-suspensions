@@ -143,7 +143,7 @@ const ContactInquiryForm = () => {
     return (
       <div className="border border-skoczek-line bg-skoczek-paper p-8">
         <h3 className="font-display text-3xl text-skoczek-ink">Zapytanie zapisane</h3>
-        <p className="mt-2 text-skoczek-muted">Skontaktujemy się najszybciej jak to możliwe. Wiadomość czeka w panelu serwisu.</p>
+        <p className="mt-2 text-skoczek-muted">Skontaktujemy się najszybciej jak to możliwe.</p>
       </div>
     );
   }
@@ -151,7 +151,6 @@ const ContactInquiryForm = () => {
   return (
     <form onSubmit={handleSubmit} className="relative space-y-3">
       <h3 className="font-display text-3xl text-skoczek-ink">Krótkie pytanie</h3>
-      <p className="text-sm text-skoczek-muted">Bez konta. Trafia do panelu, nie na skrzynkę.</p>
       <div className="absolute -left-[9999px] h-0 overflow-hidden" aria-hidden="true">
         <label>
           Firma
@@ -396,7 +395,7 @@ const App: React.FC = () => {
       <main className="flex-grow">
         {view === 'HOME' && (
           <>
-            <section className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-12 md:grid-cols-[1fr_260px] md:py-16">
+            <section className="mx-auto max-w-5xl px-4 py-12 md:py-16">
               <div>
                 <p className="font-mono text-xs uppercase tracking-wide text-skoczek-muted">Serwis zawieszenia · Białystok</p>
                 <h1 className="mt-3 max-w-xl font-display text-5xl leading-tight text-skoczek-ink md:text-6xl">Oddaj Amora</h1>
@@ -420,22 +419,6 @@ const App: React.FC = () => {
                   Gwarancja 12 miesięcy na usługę. Sprzęt można przywieźć osobiście albo wysłać.
                 </p>
               </div>
-              <aside className="relative border border-skoczek-ink bg-skoczek-card/85 p-5">
-                <div className="absolute -left-1 -top-1 h-3 w-3 border-l-2 border-t-2 border-skoczek-primary" />
-                <div className="absolute -bottom-1 -right-1 h-3 w-3 border-b-2 border-r-2 border-skoczek-primary" />
-                <p className="font-mono text-[11px] tracking-wide text-skoczek-muted">KARTA SERWISOWA · 014</p>
-                <svg viewBox="0 0 120 200" className="mx-auto mt-2 h-44 w-24 text-skoczek-ink" aria-hidden="true">
-                  <circle cx="60" cy="16" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M60 23 V40" stroke="currentColor" strokeWidth="2" />
-                  <path d="M38 46h44M34 62h52M32 78h56M34 94h52M38 110h44" fill="none" stroke="currentColor" strokeWidth="2.4" />
-                  <path d="M60 40c18 6 18 10 0 16s-18 10 0 16 18 10 0 16-18 10 0 16 18 10 0 16" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M60 120 V150" stroke="currentColor" strokeWidth="6" />
-                  <circle cx="60" cy="168" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
-                </svg>
-                <div className="stamp mx-auto mt-1 text-sm">
-                  <span>serwis<br />12 mies.<br />Białystok</span>
-                </div>
-              </aside>
             </section>
 
             <PricingSection />
