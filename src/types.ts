@@ -38,6 +38,16 @@ export interface ServiceRequest {
   estimatedCost?: number;
   clientName?: string;
   clientPhone?: string;
+  clientEmail?: string;
+}
+
+export interface ContactInquiry {
+  id: string;
+  createdAt: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
 }
 
 export interface PricingRow {

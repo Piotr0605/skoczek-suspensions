@@ -39,13 +39,14 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 - Registration and login (Supabase Auth, minimum 8-character password)
 - **Service request form** — suspension model, issue description, delivery method (in person / shipping), preferred date
 - **Client dashboard** — history of own requests with current repair status
-- Email notification to the service center after submitting a request (EmailJS)
+- The service center reads new requests in the mechanic panel. There is no outbound email.
 
 ### Mechanic Panel (Administrator)
-- Overview of all service requests
+- Overview of all service requests, including the client's email
 - Filtering: active, new, in progress, ready, history
 - Status and quote updates (PLN)
 - Archiving completed orders
+- Contact-form questions from the public site
 
 ---
 
@@ -58,7 +59,6 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 | Styling | Tailwind CSS (CDN) |
 | Icons | Lucide React |
 | Backend / Auth | Supabase (PostgreSQL + Auth + RLS) |
-| Email | EmailJS |
 | Analytics | Vercel Analytics |
 | Hosting | Vercel |
 
@@ -77,11 +77,12 @@ The application is a **SPA** (Single Page Application) with view-based navigatio
 │  ApiService (api.ts)                                         │
 │       ├── requireSession() / requireAdmin()                  │
 │       ├── auth: register, login, logout, me                  │
-│       └── requests: create, getAll, getAllForUser,           │
-│                     updateStatus                             │
+│       ├── requests: create, getAll, getAllForUser,           │
+│       │            updateStatus                              │
+│       └── inquiries: create, getAll                          │
 │       │                                                      │
 │       ▼                                                      │
-│  config.ts ──► VITE_* variables (Supabase, EmailJS)          │
+│  config.ts ──► VITE_* variables (Supabase)                   │
 │  supabaseClient.ts ──► Supabase Client                       │
 └──────────────────────────────────────────────────────────────┘
          │                                    │
@@ -94,9 +95,9 @@ The application is a **SPA** (Single Page Application) with view-based navigatio
 Service request flow:
 1. The client logs in or registers
 2. Fills out the form (with field validation) and accepts the terms and privacy policy
-3. The request is saved in Supabase with `user_id` from the active session
-4. An email notification is sent to the service center (EmailJS)
-5. The client tracks status in the dashboard; the mechanic updates the order in the admin panel
+3. The request is saved in Supabase with `user_id` and the session email
+4. The client tracks status in the dashboard; the mechanic reads the order in the admin panel
+5. A public contact question is stored in `contact_inquiries` and shown in the same panel
 
 ---
 
@@ -137,7 +138,7 @@ skoczek-suspensions/
 └── src/
     ├── index.tsx               # React app mount
     ├── vite-env.d.ts           # VITE_* variable types
-    ├── config.ts               # Supabase and EmailJS configuration
+    ├── config.ts               # Supabase configuration
     ├── App.tsx                 # Main component, navigation, layout
     ├── types.ts                # TypeScript types (User, ServiceRequest, enums)
     ├── constants.ts            # Contact info, pricing, terms, privacy policy
@@ -160,8 +161,7 @@ skoczek-suspensions/
 
 - **Node.js** 18 or newer
 - **npm** (or yarn / pnpm)
-- **Supabase** account with configured database, authentication, and RLS migration applied
-- **EmailJS** account (for email notifications about new requests)
+- **Supabase** account with configured database, authentication, and migrations `001` and `002` applied
 - **Vercel** account (production hosting)
 
 ---
@@ -204,13 +204,10 @@ Configuration is done via environment variables with the `VITE_` prefix (`.env.l
 |----------|-------------|
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Public (anon) key |
-| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID |
-| `VITE_EMAILJS_TEMPLATE_ID` | Email template ID |
-| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key |
 
-Values are loaded in `src/config.ts`. If environment variables are missing, fallbacks are used — this preserves compatibility with the existing deployment, but **setting env vars on Vercel is recommended**.
+Values are loaded in `src/config.ts`. If environment variables are missing, fallbacks are used. Outbound email is not used: new service requests and contact questions appear in the mechanic panel.
 
-The EmailJS template should include these fields: `from_name`, `from_email`, `from_phone`, `component_model`, `problem_description`, `delivery_method`, `preferred_date`.
+After `001_security_rls.sql`, run [`supabase/migrations/002_contact_details.sql`](supabase/migrations/002_contact_details.sql) in the Supabase SQL Editor. It adds `client_email` on `service_requests` and the `contact_inquiries` table. Without it, new contact questions cannot be saved.
 
 ### Administrator Role
 
@@ -269,6 +266,7 @@ Full step-by-step guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 | `preferred_date` | date | Preferred date |
 | `client_name` | text | Client full name |
 | `client_phone` | text | Contact phone |
+| `client_email` | text | Email copied from the signed-in session |
 | `status` | text | Request status (see below) |
 | `estimated_cost` | numeric | Estimated quote (PLN) |
 | `created_at` | timestamptz | Creation timestamp |

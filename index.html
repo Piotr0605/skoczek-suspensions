@@ -5,50 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Oddaj Amora - Serwis Amortyzatorów</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
-        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
+              sans: ['Source Sans 3', 'sans-serif'],
+              display: ['Fraunces', 'serif'],
+              mono: ['IBM Plex Mono', 'monospace'],
             },
             colors: {
-              gray: {
-                50: '#f9fafb',
-                100: '#f3f4f6',
-                200: '#e5e7eb',
-                300: '#d1d5db',
-                400: '#9ca3af',
-                500: '#6b7280',
-                600: '#4b5563',
-                700: '#374151',
-                800: '#1f2937',
-                900: '#111827',
-              },
               skoczek: {
-                bg: '#ffffff',
-                card: '#ffffff',
-                text: '#111111',
-                primary: '#ff5a00',
-                primaryHover: '#e04f00',
-                light: '#fff7ed',
-              }
-            },
-            animation: {
-              'spin-slow': 'spin 3s linear infinite',
-              'slide-up': 'slideUp 0.5s ease-out',
-              'fade-in': 'fadeIn 0.3s ease-out',
-            },
-            keyframes: {
-              slideUp: {
-                '0%': { transform: 'translateY(100%)' },
-                '100%': { transform: 'translateY(0)' },
-              },
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
+                paper: '#f3efe6',
+                card: '#fbf8f3',
+                ink: '#1c1915',
+                muted: '#5c564c',
+                line: '#d9d1c3',
+                primary: '#c4511a',
+                primaryHover: '#a34112',
               }
             }
           },
@@ -56,11 +31,11 @@
       }
     </script>
     <style>
-      body { background-color: #ffffff; color: #111111; }
+      body { background-color: #f3efe6; color: #1c1915; }
       ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: #f1f1f1; }
-      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #ff5a00; }
+      ::-webkit-scrollbar-track { background: #f3efe6; }
+      ::-webkit-scrollbar-thumb { background: #d9d1c3; }
+      ::-webkit-scrollbar-thumb:hover { background: #1c1915; }
     </style>
   </head>
   <body>

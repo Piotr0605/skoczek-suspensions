@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { User, DeliveryMethod } from '../types';
-import { FULL_REGULATIONS, PRIVACY_POLICY } from '../constants';
+import { FULL_REGULATIONS } from '../constants';
 import { ApiService } from '../services/api';
-import { config } from '../config';
 import { sanitizeServiceRequest, validateServiceRequest } from '../utils/validation';
-import { Check, AlertCircle, Calendar, Truck, User as UserIcon } from 'lucide-react';
-import emailjs from '@emailjs/browser';
+import { Check, AlertCircle } from 'lucide-react';
 
 interface ServiceFormProps {
   user: User | null;
   onSuccess: () => void;
   onRequestLogin: () => void;
 }
+
+const fieldClass = 'w-full border border-skoczek-line bg-skoczek-paper px-3 py-3 text-skoczek-ink outline-none focus:border-skoczek-ink';
 
 const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLogin }) => {
   const [formData, setFormData] = useState({
@@ -62,7 +62,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
     setIsSubmitting(true);
 
     try {
-      // 1. Save to Database (Supabase)
       await ApiService.requests.create({
         componentModel: sanitized.componentModel,
         problemDescription: sanitized.problemDescription,
@@ -71,27 +70,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         clientName: sanitized.clientName,
         clientPhone: sanitized.clientPhone,
       });
-
-      // 2. Send Email Notification (EmailJS)
-      try {
-        await emailjs.send(
-            config.emailjs.serviceId,
-            config.emailjs.templateId,
-            {
-                to_name: "Oddaj Amora",
-                from_name: sanitized.clientName,
-                from_email: user.email,
-                from_phone: sanitized.clientPhone,
-                component_model: sanitized.componentModel,
-                problem_description: sanitized.problemDescription,
-                delivery_method: formData.deliveryMethod,
-                preferred_date: sanitized.preferredDate
-            },
-            config.emailjs.publicKey
-        );
-      } catch (emailError) {
-          console.error("Failed to send email notification:", emailError);
-      }
 
       onSuccess();
       setFormData({
@@ -121,48 +99,39 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-xl relative">
-      <div className="border-b border-gray-100 pb-6 mb-6">
-        <h2 className="text-2xl font-black text-black flex items-center gap-3 uppercase tracking-tight">
-            <div className="bg-skoczek-primary text-white p-2 rounded">
-                <Truck className="w-5 h-5" />
-            </div>
-            Formularz Zgłoszeniowy
-        </h2>
-        <p className="text-gray-500 mt-2 ml-12 text-sm">Wypełnij szczegóły dotyczące sprzętu i usterki.</p>
+    <div className="border border-skoczek-line bg-skoczek-card p-6 md:p-8">
+      <div className="border-b border-skoczek-line pb-5 mb-6">
+        <h2 className="font-display text-3xl text-skoczek-ink">Zgłoszenie serwisu</h2>
+        <p className="mt-2 text-skoczek-muted">Model, usterka i sposób dostarczenia. Zapis trafia do panelu mechanika.</p>
       </div>
 
       {!user && (
-        <div className="mb-8 bg-orange-50 border border-skoczek-primary/20 text-orange-800 p-4 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-skoczek-primary" />
-          <div>
-            <p className="font-bold text-gray-900">Wymagane logowanie</p>
-            <p className="text-sm mt-1 text-gray-600">
-              Aby wysłać zgłoszenie serwisowe, musisz posiadać konto. 
-              <button onClick={onRequestLogin} className="text-skoczek-primary font-bold underline ml-1 hover:text-skoczek-primaryHover transition">Zaloguj się lub zarejestruj</button>.
-            </p>
-          </div>
+        <div className="mb-8 border border-skoczek-line bg-skoczek-paper p-4">
+          <p className="font-semibold text-skoczek-ink">Najpierw konto</p>
+          <p className="mt-1 text-sm text-skoczek-muted">
+            Zgłoszenie jest przypisane do Twojego konta.
+            <button onClick={onRequestLogin} className="ml-1 font-semibold text-skoczek-primary underline">Zaloguj się lub zarejestruj</button>.
+          </p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {user && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                <label className="text-xs text-gray-400 font-bold uppercase block mb-1">Klient</label>
-                <div className="flex items-center gap-2 text-gray-900 font-bold">
-                  <UserIcon className="w-4 h-4 text-gray-400" /> {user.name}
-                </div>
-             </div>
-             <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                <label className="text-xs text-gray-400 font-bold uppercase block mb-1">Kontakt</label>
-                <div className="text-gray-900 font-bold">{user.phone}</div>
-             </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="border border-skoczek-line bg-skoczek-paper p-4">
+              <p className="text-xs text-skoczek-muted">Klient</p>
+              <p className="font-semibold text-skoczek-ink">{user.name}</p>
+            </div>
+            <div className="border border-skoczek-line bg-skoczek-paper p-4">
+              <p className="text-xs text-skoczek-muted">Telefon i e-mail</p>
+              <p className="font-semibold text-skoczek-ink">{user.phone}</p>
+              <p className="font-mono text-sm text-skoczek-muted">{user.email}</p>
+            </div>
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Model Amortyzatora / Dampera</label>
+          <label className="mb-2 block text-sm font-semibold text-skoczek-ink">Model amortyzatora</label>
           <input
             type="text"
             name="componentModel"
@@ -170,128 +139,115 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
             onChange={handleChange}
             required
             placeholder="np. RockShox Pike Ultimate 2023"
-            className="w-full bg-white border border-gray-300 rounded p-4 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition placeholder-gray-400"
+            className={fieldClass}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Opis Problemu</label>
+          <label className="mb-2 block text-sm font-semibold text-skoczek-ink">Opis usterki</label>
           <textarea
             name="problemDescription"
             value={formData.problemDescription}
             onChange={handleChange}
             required
             rows={4}
-            placeholder="Opisz usterkę lub wymagane czynności serwisowe..."
-            className="w-full bg-white border border-gray-300 rounded p-4 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition placeholder-gray-400"
+            placeholder="Co stuka, cieknie albo wymaga przeglądu."
+            className={fieldClass}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Sposób Dostarczenia</label>
-             <div className="flex gap-4">
-               <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
-                 <input 
-                    type="radio" 
-                    name="deliveryMethod" 
-                    value={DeliveryMethod.PERSONAL}
-                    checked={formData.deliveryMethod === DeliveryMethod.PERSONAL}
-                    onChange={handleChange}
-                    className="hidden"
-                 />
-                 <div className="text-sm font-bold">Osobiście</div>
-                 {formData.deliveryMethod === DeliveryMethod.PERSONAL && <Check className="w-4 h-4 ml-auto" />}
-               </label>
-               
-               <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
-                 <input 
-                    type="radio" 
-                    name="deliveryMethod" 
-                    value={DeliveryMethod.SHIPPING}
-                    checked={formData.deliveryMethod === DeliveryMethod.SHIPPING}
-                    onChange={handleChange}
-                    className="hidden"
-                 />
-                 <div className="text-sm font-bold">Wysyłka</div>
-                 {formData.deliveryMethod === DeliveryMethod.SHIPPING && <Check className="w-4 h-4 ml-auto" />}
-               </label>
-             </div>
+            <p className="mb-2 text-sm font-semibold text-skoczek-ink">Dostarczenie</p>
+            <div className="flex gap-3">
+              <label className={`flex flex-1 cursor-pointer items-center justify-between border px-3 py-3 text-sm font-semibold ${formData.deliveryMethod === DeliveryMethod.PERSONAL ? 'border-skoczek-ink bg-skoczek-paper text-skoczek-ink' : 'border-skoczek-line text-skoczek-muted'}`}>
+                <input
+                  type="radio"
+                  name="deliveryMethod"
+                  value={DeliveryMethod.PERSONAL}
+                  checked={formData.deliveryMethod === DeliveryMethod.PERSONAL}
+                  onChange={handleChange}
+                  className="sr-only"
+                />
+                Osobiście
+                {formData.deliveryMethod === DeliveryMethod.PERSONAL && <Check className="h-4 w-4" />}
+              </label>
+              <label className={`flex flex-1 cursor-pointer items-center justify-between border px-3 py-3 text-sm font-semibold ${formData.deliveryMethod === DeliveryMethod.SHIPPING ? 'border-skoczek-ink bg-skoczek-paper text-skoczek-ink' : 'border-skoczek-line text-skoczek-muted'}`}>
+                <input
+                  type="radio"
+                  name="deliveryMethod"
+                  value={DeliveryMethod.SHIPPING}
+                  checked={formData.deliveryMethod === DeliveryMethod.SHIPPING}
+                  onChange={handleChange}
+                  className="sr-only"
+                />
+                Wysyłka
+                {formData.deliveryMethod === DeliveryMethod.SHIPPING && <Check className="h-4 w-4" />}
+              </label>
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Preferowany Termin</label>
-            <div className="relative">
-              <Calendar className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-              <input
-                type="date"
-                name="preferredDate"
-                value={formData.preferredDate}
-                onChange={handleChange}
-                className="w-full bg-white border border-gray-300 rounded p-3 pl-12 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
-              />
-            </div>
+            <label className="mb-2 block text-sm font-semibold text-skoczek-ink">Preferowany termin</label>
+            <input
+              type="date"
+              name="preferredDate"
+              value={formData.preferredDate}
+              onChange={handleChange}
+              className={fieldClass}
+            />
           </div>
         </div>
 
-        <div className="bg-gray-50 p-5 rounded border border-gray-200 text-sm">
-          <h4 className="text-black font-bold uppercase text-xs mb-3">Regulamin Serwisu i Polityka Prywatności</h4>
-          <div className="mb-4 h-32 overflow-y-auto custom-scrollbar text-gray-600 pr-2 border border-gray-200 bg-white p-3 rounded text-xs whitespace-pre-wrap">
+        <div className="border border-skoczek-line bg-skoczek-paper p-4 text-sm">
+          <h3 className="mb-3 font-semibold text-skoczek-ink">Regulamin i prywatność</h3>
+          <div className="mb-4 h-32 overflow-y-auto border border-skoczek-line bg-skoczek-card p-3 text-xs leading-relaxed text-skoczek-muted whitespace-pre-wrap">
             {FULL_REGULATIONS}
           </div>
-          
           <div className="space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer group select-none">
-                 <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptTerms ? 'border-skoczek-primary bg-skoczek-primary' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
-                    {formData.acceptTerms && <Check className="w-3 h-3 text-white" />}
-                 </div>
-                <input 
-                  type="checkbox" 
-                  name="acceptTerms"
-                  checked={formData.acceptTerms}
-                  onChange={handleCheckbox}
-                  className="hidden"
-                />
-                <span className={`text-xs ${error && !formData.acceptTerms ? "text-red-600 font-bold" : "text-gray-500 group-hover:text-gray-800"}`}>
-                  Oświadczam, że zapoznałem się z Regulaminem Serwisu i akceptuję jego warunki.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 cursor-pointer group select-none">
-                 <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptPrivacy ? 'border-skoczek-primary bg-skoczek-primary' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
-                    {formData.acceptPrivacy && <Check className="w-3 h-3 text-white" />}
-                 </div>
-                <input 
-                  type="checkbox" 
-                  name="acceptPrivacy"
-                  checked={formData.acceptPrivacy}
-                  onChange={handleCheckbox}
-                  className="hidden"
-                />
-                <span className={`text-xs ${error && !formData.acceptPrivacy ? "text-red-600 font-bold" : "text-gray-500 group-hover:text-gray-800"}`}>
-                  Zapoznałem się z Polityką Prywatności serwisu (RODO).
-                </span>
-              </label>
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                name="acceptTerms"
+                checked={formData.acceptTerms}
+                onChange={handleCheckbox}
+                className="mt-1"
+              />
+              <span className={error && !formData.acceptTerms ? 'font-semibold text-red-700' : 'text-skoczek-muted'}>
+                Akceptuję regulamin serwisu.
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                name="acceptPrivacy"
+                checked={formData.acceptPrivacy}
+                onChange={handleCheckbox}
+                className="mt-1"
+              />
+              <span className={error && !formData.acceptPrivacy ? 'font-semibold text-red-700' : 'text-skoczek-muted'}>
+                Zapoznałem się z polityką prywatności.
+              </span>
+            </label>
           </div>
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm font-bold flex items-center gap-2 bg-red-50 p-3 rounded border border-red-100">
-            <AlertCircle className="w-4 h-4" /> {error}
+          <div className="flex items-center gap-2 border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+            <AlertCircle className="h-4 w-4" /> {error}
           </div>
         )}
 
         <button
           type="submit"
           disabled={isSubmitting || !user}
-          className={`w-full py-4 rounded font-black text-lg uppercase tracking-wider flex justify-center items-center gap-2 transition-all shadow-lg
-            ${isSubmitting || !user
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' 
-              : 'bg-skoczek-primary text-white hover:bg-skoczek-primaryHover shadow-skoczek-primary/30'
-            }`}
+          className={`flex w-full items-center justify-center gap-2 py-3 text-base font-semibold ${
+            isSubmitting || !user
+              ? 'cursor-not-allowed bg-skoczek-line text-skoczek-muted'
+              : 'bg-skoczek-primary text-white hover:bg-skoczek-primaryHover'
+          }`}
         >
-          {isSubmitting ? 'Przetwarzanie...' : 'Wyślij Zgłoszenie'}
-          {!isSubmitting && <Check className="w-5 h-5" />}
+          {isSubmitting ? 'Zapisywanie...' : 'Zapisz zgłoszenie'}
         </button>
       </form>
     </div>

@@ -1,26 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { ServiceRequest, ServiceStatus } from '../types';
+import { ContactInquiry, ServiceRequest, ServiceStatus } from '../types';
 import { ApiService } from '../services/api';
-import { RefreshCw, Save, Filter, Phone, Archive } from 'lucide-react';
+import { RefreshCw, Save, Archive, Phone } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inquiryError, setInquiryError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<ServiceStatus | 'ALL' | 'HISTORY'>('ALL');
-  
-  // Local state for editing rows (id -> { status, cost, isDirty })
   const [edits, setEdits] = useState<Record<string, { status: ServiceStatus, cost: string }>>({});
 
   const fetchRequests = async () => {
     setLoading(true);
+    setInquiryError(null);
     try {
-        const data = await ApiService.requests.getAll();
-        setRequests(data);
+      const data = await ApiService.requests.getAll();
+      setRequests(data);
     } catch (e) {
-        console.error("Failed to fetch admin data", e);
-        alert("Błąd pobierania danych. Upewnij się, że masz uprawnienia Administratora.");
+      console.error("Failed to fetch admin data", e);
+      alert("Błąd pobierania danych. Upewnij się, że masz uprawnienia Administratora.");
+    }
+
+    try {
+      const inquiryData = await ApiService.inquiries.getAll();
+      setInquiries(inquiryData);
+    } catch (e) {
+      console.error("Failed to fetch inquiries", e);
+      setInquiryError("Nie udało się pobrać zapytań. Uruchom migrację 002 w Supabase.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -30,21 +39,21 @@ const AdminDashboard: React.FC = () => {
 
   const handleStatusChange = (id: string, newStatus: ServiceStatus) => {
     setEdits(prev => ({
-        ...prev,
-        [id]: { 
-            status: newStatus, 
-            cost: prev[id]?.cost || requests.find(r => r.id === id)?.estimatedCost?.toString() || '' 
-        }
+      ...prev,
+      [id]: {
+        status: newStatus,
+        cost: prev[id]?.cost || requests.find(r => r.id === id)?.estimatedCost?.toString() || ''
+      }
     }));
   };
 
   const handleCostChange = (id: string, newCost: string) => {
     setEdits(prev => ({
-        ...prev,
-        [id]: { 
-            status: prev[id]?.status || requests.find(r => r.id === id)?.status as ServiceStatus, 
-            cost: newCost 
-        }
+      ...prev,
+      [id]: {
+        status: prev[id]?.status || requests.find(r => r.id === id)?.status as ServiceStatus,
+        cost: newCost
+      }
     }));
   };
 
@@ -53,169 +62,153 @@ const AdminDashboard: React.FC = () => {
     if (!edit) return;
 
     try {
-        await ApiService.requests.updateStatus(id, edit.status, parseFloat(edit.cost) || 0);
-        // Refresh local data to match
-        setRequests(prev => prev.map(r => r.id === id ? { ...r, status: edit.status, estimatedCost: parseFloat(edit.cost) || 0 } : r));
-        
-        // Remove from edits
-        const newEdits = { ...edits };
-        delete newEdits[id];
-        setEdits(newEdits);
+      await ApiService.requests.updateStatus(id, edit.status, parseFloat(edit.cost) || 0);
+      setRequests(prev => prev.map(r => r.id === id ? { ...r, status: edit.status, estimatedCost: parseFloat(edit.cost) || 0 } : r));
+      const newEdits = { ...edits };
+      delete newEdits[id];
+      setEdits(newEdits);
     } catch (e) {
-        alert("Błąd zapisu");
+      alert("Błąd zapisu");
     }
   };
 
-  // Quick archive (set status to COMPLETED)
   const archiveRequest = async (id: string) => {
-      if (!window.confirm("Czy na pewno chcesz zakończyć to zlecenie i przenieść je do historii?")) return;
-      try {
-          await ApiService.requests.updateStatus(id, ServiceStatus.COMPLETED);
-          setRequests(prev => prev.map(r => r.id === id ? { ...r, status: ServiceStatus.COMPLETED } : r));
-      } catch (e) {
-          alert("Błąd archiwizacji");
-      }
+    if (!window.confirm("Czy na pewno chcesz zakończyć to zlecenie i przenieść je do historii?")) return;
+    try {
+      await ApiService.requests.updateStatus(id, ServiceStatus.COMPLETED);
+      setRequests(prev => prev.map(r => r.id === id ? { ...r, status: ServiceStatus.COMPLETED } : r));
+    } catch (e) {
+      alert("Błąd archiwizacji");
+    }
   };
 
-  // Filter logic
   const filteredRequests = requests.filter(r => {
-      if (filterStatus === 'HISTORY') {
-          return r.status === ServiceStatus.COMPLETED;
-      }
-      if (filterStatus === 'ALL') {
-          // In the "All" view, show everything EXCEPT completed (those are in history)
-          return r.status !== ServiceStatus.COMPLETED;
-      }
-      return r.status === filterStatus;
+    if (filterStatus === 'HISTORY') {
+      return r.status === ServiceStatus.COMPLETED;
+    }
+    if (filterStatus === 'ALL') {
+      return r.status !== ServiceStatus.COMPLETED;
+    }
+    return r.status === filterStatus;
   });
 
+  const filterButton = (active: boolean) =>
+    `px-3 py-1 text-sm ${active ? 'border-skoczek-ink bg-skoczek-ink text-skoczek-paper' : 'border-skoczek-line bg-skoczek-card text-skoczek-muted'}`;
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 gap-4">
+    <div className="space-y-10">
+      <div className="flex flex-col items-start justify-between gap-4 border-b border-skoczek-line pb-6 md:flex-row md:items-end">
         <div>
-           <div className="flex items-center gap-2 mb-1">
-             <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded uppercase">Admin</span>
-             <h2 className="text-3xl font-black text-black tracking-tight uppercase">Panel Mechanika</h2>
-           </div>
-           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi.</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-skoczek-primary">Warsztat</p>
+          <h2 className="font-display text-4xl text-skoczek-ink">Panel mechanika</h2>
+          <p className="mt-1 text-sm text-skoczek-muted">Zlecenia i zapytania z formularza. Odśwież, żeby zobaczyć nowe.</p>
         </div>
-        <div className="flex gap-2">
-            <button 
-            onClick={fetchRequests} 
-            className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded text-sm font-bold uppercase hover:border-skoczek-primary hover:text-skoczek-primary transition"
-            >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież
-            </button>
-        </div>
+        <button
+          onClick={fetchRequests}
+          className="inline-flex items-center gap-2 border border-skoczek-line px-4 py-2 text-sm font-semibold hover:border-skoczek-ink"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież
+        </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
-         <Filter className="w-4 h-4 text-gray-500 mr-2" />
-         <button onClick={() => setFilterStatus('ALL')} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === 'ALL' ? 'bg-black text-white' : 'bg-white text-gray-600 border'}`}>Bieżące</button>
-         <button onClick={() => setFilterStatus(ServiceStatus.PENDING)} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === ServiceStatus.PENDING ? 'bg-yellow-500 text-white' : 'bg-white text-gray-600 border'}`}>Nowe</button>
-         <button onClick={() => setFilterStatus(ServiceStatus.IN_PROGRESS)} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === ServiceStatus.IN_PROGRESS ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 border'}`}>W trakcie</button>
-         <button onClick={() => setFilterStatus(ServiceStatus.READY)} className={`px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === ServiceStatus.READY ? 'bg-green-500 text-white' : 'bg-white text-gray-600 border'}`}>Gotowe</button>
-         
-         <div className="h-6 w-px bg-gray-300 mx-2"></div>
-         
-         <button onClick={() => setFilterStatus('HISTORY')} className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-bold uppercase ${filterStatus === 'HISTORY' ? 'bg-gray-700 text-white' : 'bg-white text-gray-600 border'}`}>
-             <Archive className="w-3 h-3" /> Historia
-         </button>
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => setFilterStatus('ALL')} className={`border ${filterButton(filterStatus === 'ALL')}`}>Bieżące</button>
+        <button onClick={() => setFilterStatus(ServiceStatus.PENDING)} className={`border ${filterButton(filterStatus === ServiceStatus.PENDING)}`}>Nowe</button>
+        <button onClick={() => setFilterStatus(ServiceStatus.IN_PROGRESS)} className={`border ${filterButton(filterStatus === ServiceStatus.IN_PROGRESS)}`}>W trakcie</button>
+        <button onClick={() => setFilterStatus(ServiceStatus.READY)} className={`border ${filterButton(filterStatus === ServiceStatus.READY)}`}>Gotowe</button>
+        <button onClick={() => setFilterStatus('HISTORY')} className={`inline-flex items-center gap-1 border ${filterButton(filterStatus === 'HISTORY')}`}>
+          <Archive className="h-3 w-3" /> Historia
+        </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      <div className="border border-skoczek-line bg-skoczek-card">
         <div className="overflow-x-auto">
-          <table className="w-full text-left min-w-[1000px]">
-            <thead className="bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider">
+          <table className="w-full min-w-[1000px] text-left">
+            <thead className="border-b border-skoczek-line text-xs uppercase tracking-wide text-skoczek-muted">
               <tr>
-                <th className="p-4 border-b">Data / ID</th>
-                <th className="p-4 border-b">Klient</th>
-                <th className="p-4 border-b">Sprzęt / Usterka</th>
-                <th className="p-4 border-b w-48">Status</th>
-                <th className="p-4 border-b w-32">Wycena (PLN)</th>
-                <th className="p-4 border-b w-32 text-center">Akcje</th>
+                <th className="p-4">Data</th>
+                <th className="p-4">Klient</th>
+                <th className="p-4">Sprzęt</th>
+                <th className="w-48 p-4">Status</th>
+                <th className="w-32 p-4">Wycena</th>
+                <th className="w-28 p-4 text-center">Akcje</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-skoczek-line">
               {filteredRequests.map((req) => {
                 const isEditing = !!edits[req.id];
                 const currentStatus = edits[req.id]?.status || req.status;
                 const currentCost = edits[req.id]?.cost !== undefined ? edits[req.id].cost : (req.estimatedCost || '');
                 const isCompleted = req.status === ServiceStatus.COMPLETED;
+                const isNew = req.status === ServiceStatus.PENDING;
 
                 return (
-                  <tr key={req.id} className={`hover:bg-gray-50 transition group ${isCompleted ? 'opacity-60 bg-gray-50' : ''}`}>
+                  <tr key={req.id} className={isCompleted ? 'bg-skoczek-paper text-skoczek-muted' : ''}>
                     <td className="p-4 align-top">
-                      <div className="font-bold text-gray-900">{new Date(req.createdAt).toLocaleDateString('pl-PL')}</div>
-                      <div className="text-xs text-gray-400 font-mono mt-1">{req.id.slice(0, 8)}...</div>
-                      <div className="mt-2 text-xs bg-gray-200 inline-block px-1.5 py-0.5 rounded text-gray-600 font-bold">{req.deliveryMethod === 'Osobisty' ? 'OSOB.' : 'WYSYŁKA'}</div>
+                      <div className="font-semibold text-skoczek-ink">{new Date(req.createdAt).toLocaleDateString('pl-PL')}</div>
+                      <div className="mt-1 font-mono text-xs text-skoczek-muted">{req.id.slice(0, 8)}</div>
+                      <div className="mt-2 text-xs">{req.deliveryMethod === 'Osobisty' ? 'Odbiór osobisty' : 'Wysyłka'}</div>
+                      {isNew && <div className="mt-2 text-xs font-semibold text-skoczek-primary">Nowe</div>}
                     </td>
                     <td className="p-4 align-top">
-                      <div className="font-bold text-black text-sm">{req.clientName || 'Brak danych'}</div>
+                      <div className="font-semibold text-skoczek-ink">{req.clientName || 'Brak danych'}</div>
                       {req.clientPhone && (
-                          <a href={`tel:${req.clientPhone}`} className="inline-flex items-center gap-1 text-xs font-bold text-skoczek-primary hover:underline mt-1">
-                              <Phone className="w-3 h-3" /> {req.clientPhone}
-                          </a>
+                        <a href={`tel:${req.clientPhone}`} className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-skoczek-ink">
+                          <Phone className="h-3 w-3" /> {req.clientPhone}
+                        </a>
+                      )}
+                      {req.clientEmail && (
+                        <a href={`mailto:${req.clientEmail}`} className="mt-1 block font-mono text-sm text-skoczek-primary">
+                          {req.clientEmail}
+                        </a>
                       )}
                     </td>
                     <td className="p-4 align-top">
-                      <div className="text-black font-bold text-sm mb-1">{req.componentModel}</div>
-                      <div className="text-xs text-gray-500 bg-white border border-gray-200 p-2 rounded max-h-20 overflow-y-auto custom-scrollbar">
-                        {req.problemDescription}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-2">
-                        Termin: <span className="text-gray-600 font-medium">{req.preferredDate || 'Brak'}</span>
-                      </div>
+                      <div className="font-semibold text-skoczek-ink">{req.componentModel}</div>
+                      <p className="mt-2 max-h-24 overflow-y-auto text-sm text-skoczek-muted">{req.problemDescription}</p>
+                      <p className="mt-2 text-xs text-skoczek-muted">Termin: {req.preferredDate || 'brak'}</p>
                     </td>
                     <td className="p-4 align-top">
-                       <select 
-                         value={currentStatus}
-                         onChange={(e) => handleStatusChange(req.id, e.target.value as ServiceStatus)}
-                         className={`w-full text-xs font-bold uppercase p-2 rounded border focus:ring-2 focus:ring-skoczek-primary outline-none cursor-pointer
-                           ${currentStatus === ServiceStatus.PENDING ? 'bg-yellow-50 text-yellow-800 border-yellow-200' : ''}
-                           ${currentStatus === ServiceStatus.READY ? 'bg-green-50 text-green-800 border-green-200' : ''}
-                           ${currentStatus === ServiceStatus.IN_PROGRESS ? 'bg-orange-50 text-orange-800 border-orange-200' : ''}
-                           ${currentStatus === ServiceStatus.COMPLETED ? 'bg-gray-100 text-gray-600 border-gray-200' : ''}
-                         `}
-                       >
-                         {Object.values(ServiceStatus).map(s => (
-                           <option key={s} value={s}>{s}</option>
-                         ))}
-                       </select>
+                      <select
+                        value={currentStatus}
+                        onChange={(e) => handleStatusChange(req.id, e.target.value as ServiceStatus)}
+                        className="w-full border border-skoczek-line bg-skoczek-paper p-2 text-sm"
+                      >
+                        {Object.values(ServiceStatus).map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
                     </td>
                     <td className="p-4 align-top">
-                       <div className="relative">
-                         <input 
-                           type="number" 
-                           value={currentCost}
-                           onChange={(e) => handleCostChange(req.id, e.target.value)}
-                           placeholder="0.00"
-                           className="w-full bg-white border border-gray-300 rounded p-2 text-right text-sm font-bold focus:border-skoczek-primary outline-none"
-                         />
-                         <span className="absolute left-2 top-2 text-xs text-gray-400">PLN</span>
-                       </div>
+                      <input
+                        type="number"
+                        value={currentCost}
+                        onChange={(e) => handleCostChange(req.id, e.target.value)}
+                        placeholder="0"
+                        className="w-full border border-skoczek-line bg-skoczek-paper p-2 text-right font-mono text-sm"
+                      />
                     </td>
-                    <td className="p-4 align-top text-center flex gap-2 justify-center">
-                       {isEditing && (
-                         <button 
-                           onClick={() => saveChanges(req.id)}
-                           className="bg-skoczek-primary text-white p-2 rounded hover:bg-skoczek-primaryHover transition shadow-md"
-                           title="Zapisz zmiany"
-                         >
-                           <Save className="w-4 h-4" />
-                         </button>
-                       )}
-                       
-                       {!isCompleted && (
-                           <button 
-                             onClick={() => archiveRequest(req.id)}
-                             className="bg-gray-100 text-gray-500 p-2 rounded hover:bg-gray-200 border border-gray-200 transition"
-                             title="Zakończ i przenieś do historii"
-                           >
-                             <Archive className="w-4 h-4" />
-                           </button>
-                       )}
+                    <td className="p-4 align-top">
+                      <div className="flex justify-center gap-2">
+                        {isEditing && (
+                          <button
+                            onClick={() => saveChanges(req.id)}
+                            className="bg-skoczek-primary p-2 text-white"
+                            title="Zapisz zmiany"
+                          >
+                            <Save className="h-4 w-4" />
+                          </button>
+                        )}
+                        {!isCompleted && (
+                          <button
+                            onClick={() => archiveRequest(req.id)}
+                            className="border border-skoczek-line p-2 text-skoczek-muted"
+                            title="Zakończ i przenieś do historii"
+                          >
+                            <Archive className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -224,9 +217,34 @@ const AdminDashboard: React.FC = () => {
           </table>
         </div>
         {filteredRequests.length === 0 && (
-            <div className="p-12 text-center text-gray-500">Brak zgłoszeń w tej kategorii.</div>
+          <div className="p-12 text-center text-skoczek-muted">Brak zgłoszeń w tej kategorii.</div>
         )}
       </div>
+
+      <section>
+        <h3 className="font-display text-3xl text-skoczek-ink">Zapytania</h3>
+        <p className="mt-1 text-sm text-skoczek-muted">Wiadomości z formularza na stronie kontaktu.</p>
+        {inquiryError && <p className="mt-3 text-sm text-red-700">{inquiryError}</p>}
+        {inquiries.length === 0 && !inquiryError ? (
+          <p className="mt-4 text-sm text-skoczek-muted">Brak zapytań.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-skoczek-line border border-skoczek-line bg-skoczek-card">
+            {inquiries.map((item) => (
+              <li key={item.id} className="grid gap-2 p-4 md:grid-cols-[180px_1fr]">
+                <div>
+                  <p className="font-mono text-xs text-skoczek-muted">{new Date(item.createdAt).toLocaleString('pl-PL')}</p>
+                  <p className="mt-1 font-semibold text-skoczek-ink">{item.name}</p>
+                  <a href={`mailto:${item.email}`} className="font-mono text-sm text-skoczek-primary">{item.email}</a>
+                </div>
+                <div>
+                  <p className="font-semibold text-skoczek-ink">{item.subject}</p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-skoczek-muted">{item.message}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 };
