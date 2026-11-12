@@ -16,6 +16,11 @@ This will:
 - enable RLS on the `service_requests` table,
 - set access policies (client → own data, admin → everything).
 
+Then run `supabase/migrations/002_pricing_and_hardening.sql` the same way. It:
+- creates the `pricing` table (editable price list, public read, admin-only write),
+- allows clients to create requests only with the initial status and no quote,
+- adds length limits on request fields (existing rows are not checked).
+
 ### 2. Verify the Administrator
 
 In Supabase → **Authentication** → **Users** → select the admin account.
@@ -58,6 +63,12 @@ Vercel will build and deploy automatically. The public site (landing, pricing, c
 Without these variables the app uses fallbacks — it works as before.
 
 ### 5. Post-Deployment Test
+
+- [ ] Response headers contain `Content-Security-Policy` and `Strict-Transport-Security` (DevTools → Network → document)
+- [ ] No CSP errors in the browser console (map, login, contact form, analytics)
+- [ ] Direct links work: `/kontakt`, `/regulamin`, `/zglos-serwis`
+- [ ] Mechanic panel → "Cennik" → change a price → "Zapisz cennik" → the price updates on the home page
+- [ ] Submit `https://oddajamora.pl/sitemap.xml` in Google Search Console
 
 - [ ] Home page, pricing, contact — unchanged
 - [ ] Client registration and login
