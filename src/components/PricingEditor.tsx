@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PricingBrand, PricingCategory, PricingCategoryId, PricingRow, PricingService } from '../types';
 import { ApiService } from '../services/api';
 import { PRICING_DATA } from '../constants';
@@ -10,6 +10,7 @@ interface PricingEditorProps {
   source: 'database' | 'default';
   updatedAt?: string;
   onSaved: (pricing: PricingCategory[]) => void;
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
 const CATEGORY_LABELS: Record<PricingCategoryId, string> = {
@@ -34,17 +35,28 @@ const inputClass =
 const iconButton =
   'p-2 rounded border border-gray-200 bg-white text-gray-500 hover:text-skoczek-primary hover:border-skoczek-primary transition disabled:opacity-30 disabled:hover:text-gray-500 disabled:hover:border-gray-200';
 
-const PricingEditor: React.FC<PricingEditorProps> = ({ pricing, source, updatedAt, onSaved }) => {
+const PricingEditor: React.FC<PricingEditorProps> = ({ pricing, source, updatedAt, onSaved, onDirtyChange }) => {
   const [draft, setDraft] = useState<PricingCategory[]>(() => clone(pricing));
   const [activeTab, setActiveTab] = useState<PricingCategoryId>('FRONT');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  const previousPricing = useRef(pricing);
   useEffect(() => {
-    setDraft(clone(pricing));
+    if (previousPricing.current === pricing) return;
+    const untouched = JSON.stringify(previousPricing.current);
+    previousPricing.current = pricing;
+    // Only adopt newly loaded data when the admin has not started editing.
+    setDraft((current) => (JSON.stringify(current) === untouched ? clone(pricing) : current));
   }, [pricing]);
 
   const isDirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(pricing), [draft, pricing]);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -88,6 +100,7 @@ const PricingEditor: React.FC<PricingEditorProps> = ({ pricing, source, updatedA
     setSaving(true);
     try {
       const saved = await ApiService.pricing.save(draft);
+      setDraft(clone(saved));
       onSaved(saved);
       setMessage({ type: 'success', text: 'Cennik zapisany. Zmiany są już widoczne na stronie.' });
     } catch (e) {

@@ -9,9 +9,10 @@ interface AdminDashboardProps {
   pricingSource: 'database' | 'default';
   pricingUpdatedAt?: string;
   onPricingSaved: (pricing: PricingCategory[]) => void;
+  onPricingDirtyChange?: (dirty: boolean) => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ pricing, pricingSource, pricingUpdatedAt, onPricingSaved }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ pricing, pricingSource, pricingUpdatedAt, onPricingSaved, onPricingDirtyChange }) => {
   const [section, setSection] = useState<'REQUESTS' | 'PRICING'>('REQUESTS');
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,9 +140,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ pricing, pricingSource,
         ))}
       </div>
 
-      {section === 'PRICING' && (
-        <PricingEditor pricing={pricing} source={pricingSource} updatedAt={pricingUpdatedAt} onSaved={onPricingSaved} />
-      )}
+      <div hidden={section !== 'PRICING'}>
+        <PricingEditor
+          pricing={pricing}
+          source={pricingSource}
+          updatedAt={pricingUpdatedAt}
+          onSaved={onPricingSaved}
+          onDirtyChange={onPricingDirtyChange}
+        />
+      </div>
 
       {section === 'REQUESTS' && (<>
 

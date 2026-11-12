@@ -4,18 +4,17 @@ import { FULL_REGULATIONS, PRIVACY_POLICY } from '../constants';
 import { ApiService } from '../services/api';
 import { config } from '../config';
 import { sanitizeServiceRequest, validateServiceRequest } from '../utils/validation';
-import { Check, AlertCircle, Calendar, Truck, User as UserIcon } from 'lucide-react';
+import { Check, AlertCircle, Calendar, Truck, User as UserIcon, X } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
 interface ServiceFormProps {
   user: User | null;
   onSuccess: () => void;
   onRequestLogin: () => void;
-  onOpenRegulations: () => void;
-  onOpenPrivacy: () => void;
 }
 
-const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLogin, onOpenRegulations, onOpenPrivacy }) => {
+const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLogin }) => {
+  const [legalDoc, setLegalDoc] = useState<'REGULATIONS' | 'PRIVACY' | null>(null);
   const [formData, setFormData] = useState({
     componentModel: '',
     problemDescription: '',
@@ -262,7 +261,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
                 />
                 <span className={`text-xs ${error && !formData.acceptTerms ? "text-red-600 font-bold" : "text-gray-500 group-hover:text-gray-800"}`}>
                   Oświadczam, że zapoznałem się z{' '}
-                  <button type="button" onClick={(e) => { e.preventDefault(); onOpenRegulations(); }} className="underline font-bold hover:text-skoczek-primary">Regulaminem Serwisu</button>
+                  <button type="button" onClick={(e) => { e.preventDefault(); setLegalDoc('REGULATIONS'); }} className="underline font-bold hover:text-skoczek-primary">Regulaminem Serwisu</button>
                   {' '}i akceptuję jego warunki.
                 </span>
               </label>
@@ -280,7 +279,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
                 />
                 <span className={`text-xs ${error && !formData.acceptPrivacy ? "text-red-600 font-bold" : "text-gray-500 group-hover:text-gray-800"}`}>
                   Zapoznałem się z{' '}
-                  <button type="button" onClick={(e) => { e.preventDefault(); onOpenPrivacy(); }} className="underline font-bold hover:text-skoczek-primary">Polityką Prywatności</button>
+                  <button type="button" onClick={(e) => { e.preventDefault(); setLegalDoc('PRIVACY'); }} className="underline font-bold hover:text-skoczek-primary">Polityką Prywatności</button>
                   {' '}serwisu (RODO).
                 </span>
               </label>
@@ -306,6 +305,35 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
           {!isSubmitting && <Check className="w-5 h-5" />}
         </button>
       </form>
+
+      {legalDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fade-in" onClick={() => setLegalDoc(null)}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="legal-title"
+            className="bg-white w-full max-w-3xl max-h-[85vh] rounded-lg shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <h2 id="legal-title" className="font-black uppercase text-black">
+                {legalDoc === 'REGULATIONS' ? 'Regulamin Serwisu' : 'Polityka Prywatności i RODO'}
+              </h2>
+              <button type="button" onClick={() => setLegalDoc(null)} aria-label="Zamknij" className="text-gray-400 hover:text-black">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+              {legalDoc === 'REGULATIONS' ? FULL_REGULATIONS : PRIVACY_POLICY}
+            </div>
+            <div className="p-4 border-t border-gray-200 text-right">
+              <button type="button" onClick={() => setLegalDoc(null)} className="bg-skoczek-primary text-white font-bold px-6 py-2 rounded uppercase text-sm hover:bg-skoczek-primaryHover transition">
+                Wróć do formularza
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

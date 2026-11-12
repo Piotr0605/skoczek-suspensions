@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import emailjs from '@emailjs/browser';
 import { PricingCategory, PricingCategoryId, User } from './types';
@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 
 const COOKIE_KEY = 'skoczek_cookie_consent';
+const OPEN_PRICING_EVENT = 'oddajamora:open-pricing';
+const UNSAVED_PRICING_MESSAGE = 'Masz niezapisane zmiany w cenniku. Czy na pewno chcesz opuścić edytor?';
 type CookieConsent = 'accepted' | 'rejected' | null;
 
 const PHONE_HREF = `tel:${PHONE.replace(/\s+/g, '')}`;
@@ -275,7 +277,18 @@ const CATEGORY_TABS: Record<PricingCategoryId, string> = {
 
 const PricingSection: React.FC<{ pricing: PricingCategory[] }> = ({ pricing }) => {
   const [activeTab, setActiveTab] = useState<PricingCategoryId>('FRONT');
-  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(() => window.location.hash === '#cennik');
+
+  useEffect(() => {
+    const open = () => setIsMobileExpanded(true);
+    const onHashChange = () => { if (window.location.hash === '#cennik') open(); };
+    window.addEventListener(OPEN_PRICING_EVENT, open);
+    window.addEventListener('hashchange', onHashChange);
+    return () => {
+      window.removeEventListener(OPEN_PRICING_EVENT, open);
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, []);
 
   const activeData = pricing.find(d => d.id === activeTab) ?? pricing[0];
 
@@ -405,7 +418,14 @@ const App: React.FC = () => {
     source: 'default',
   });
 
+  const pricingDirtyRef = useRef(false);
+  const handlePricingDirtyChange = useCallback((dirty: boolean) => { pricingDirtyRef.current = dirty; }, []);
+
   const navigate = useCallback((target: View, hash?: string) => {
+    if (pricingDirtyRef.current && target !== 'ADMIN') {
+      if (!window.confirm(UNSAVED_PRICING_MESSAGE)) return;
+      pricingDirtyRef.current = false;
+    }
     const path = ROUTES[target].path || '/';
     const url = `${path}${hash ? `#${hash}` : ''}`;
     if (`${window.location.pathname}${window.location.hash}` !== url) {
@@ -413,6 +433,7 @@ const App: React.FC = () => {
     }
     setView(target);
     setMobileMenuOpen(false);
+    if (hash === 'cennik') window.dispatchEvent(new Event(OPEN_PRICING_EVENT));
     if (hash) {
       requestAnimationFrame(() => document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' }));
     } else {
@@ -421,7 +442,17 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const onPopState = () => setView(viewFromPath(window.location.pathname));
+    const onPopState = () => {
+      const next = viewFromPath(window.location.pathname);
+      if (pricingDirtyRef.current && next !== 'ADMIN') {
+        if (!window.confirm(UNSAVED_PRICING_MESSAGE)) {
+          window.history.pushState({ view: 'ADMIN' }, '', ROUTES.ADMIN.path);
+          return;
+        }
+        pricingDirtyRef.current = false;
+      }
+      setView(next);
+    };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
@@ -452,6 +483,10 @@ const App: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    if (pricingDirtyRef.current) {
+      if (!window.confirm(UNSAVED_PRICING_MESSAGE)) return;
+      pricingDirtyRef.current = false;
+    }
     await ApiService.auth.logout();
     setUser(null);
     navigate('HOME');
@@ -890,8 +925,6 @@ const App: React.FC = () => {
                 user={user} 
                 onSuccess={() => navigate('DASHBOARD')} 
                 onRequestLogin={() => setIsAuthModalOpen(true)}
-                onOpenRegulations={() => navigate('REGULATIONS')}
-                onOpenPrivacy={() => navigate('PRIVACY')}
               />
           </PageShell>
         )}
@@ -914,6 +947,7 @@ const App: React.FC = () => {
                 pricingSource={pricing.source}
                 pricingUpdatedAt={pricing.updatedAt}
                 onPricingSaved={(data) => setPricing({ data, source: 'database', updatedAt: new Date().toISOString() })}
+                onPricingDirtyChange={handlePricingDirtyChange}
               />
             </PageShell>
           ) : (
