@@ -3,68 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Oddaj Amora - Serwis Amortyzatorów</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-            colors: {
-              gray: {
-                50: '#f9fafb',
-                100: '#f3f4f6',
-                200: '#e5e7eb',
-                300: '#d1d5db',
-                400: '#9ca3af',
-                500: '#6b7280',
-                600: '#4b5563',
-                700: '#374151',
-                800: '#1f2937',
-                900: '#111827',
-              },
-              skoczek: {
-                bg: '#ffffff',
-                card: '#ffffff',
-                text: '#111111',
-                primary: '#ff5a00',
-                primaryHover: '#e04f00',
-                light: '#fff7ed',
-              }
-            },
-            animation: {
-              'spin-slow': 'spin 3s linear infinite',
-              'slide-up': 'slideUp 0.5s ease-out',
-              'fade-in': 'fadeIn 0.3s ease-out',
-            },
-            keyframes: {
-              slideUp: {
-                '0%': { transform: 'translateY(100%)' },
-                '100%': { transform: 'translateY(0)' },
-              },
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              }
-            }
-          },
-        },
-      }
+    <title>Serwis amortyzatorów rowerowych Białystok | Oddaj Amora</title>
+    <meta name="description" content="Profesjonalny serwis amortyzatorów i damperów rowerowych w Białymstoku: FOX, RockShox, Marzocchi, Ohlins, SR Suntour, Manitou, DVO. Przejrzysty cennik, wysyłka z całej Polski, 12 miesięcy gwarancji." />
+    <meta name="keywords" content="serwis amortyzatorów, serwis amortyzatora rowerowego, serwis dampera, Białystok, FOX, RockShox, Marzocchi, Ohlins, SR Suntour, Manitou, DVO, cennik serwisu amortyzatora" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#ff5a00" />
+    <meta name="author" content="Galeria Rowerowa Sp. z o.o." />
+    <meta name="format-detection" content="telephone=yes" />
+    <link rel="canonical" href="https://oddajamora.pl/" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-512.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:site_name" content="Oddaj Amora" />
+    <meta property="og:title" content="Serwis amortyzatorów rowerowych Białystok | Oddaj Amora" />
+    <meta property="og:description" content="Serwis, naprawa i regulacja amortyzatorów oraz damperów rowerowych. FOX, RockShox, Marzocchi, Ohlins i inne. Sprawdź cennik i zgłoś serwis online." />
+    <meta property="og:url" content="https://oddajamora.pl/" />
+    <meta property="og:image" content="https://oddajamora.pl/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Oddaj Amora – serwis amortyzatorów rowerowych w Białymstoku" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Serwis amortyzatorów rowerowych Białystok | Oddaj Amora" />
+    <meta name="twitter:description" content="Serwis, naprawa i regulacja amortyzatorów oraz damperów rowerowych. Sprawdź cennik i zgłoś serwis online." />
+    <meta name="twitter:image" content="https://oddajamora.pl/og-image.png" />
+
+    <meta name="geo.region" content="PL-PD" />
+    <meta name="geo.placename" content="Białystok" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BicycleStore",
+      "@id": "https://oddajamora.pl/#business",
+      "name": "Oddaj Amora – serwis amortyzatorów rowerowych",
+      "alternateName": "Oddaj Amora",
+      "description": "Serwis, naprawa i regulacja amortyzatorów oraz damperów rowerowych marek FOX, RockShox, Marzocchi, Ohlins, SR Suntour, Manitou, DVO, DT Swiss i Cane Creek.",
+      "url": "https://oddajamora.pl/",
+      "logo": "https://oddajamora.pl/icon-512.png",
+      "image": "https://oddajamora.pl/og-image.png",
+      "telephone": "+48884343148",
+      "email": "galeriarowerowapl@gmail.com",
+      "priceRange": "50–1300 PLN",
+      "currenciesAccepted": "PLN",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "ul. Mickiewicza 39",
+        "postalCode": "15-213",
+        "addressLocality": "Białystok",
+        "addressRegion": "podlaskie",
+        "addressCountry": "PL"
+      },
+      "areaServed": [
+        { "@type": "City", "name": "Białystok" },
+        { "@type": "Country", "name": "Polska" }
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "10:00",
+          "closes": "18:00"
+        }
+      ],
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "Galeria Rowerowa Sp. z o.o.",
+        "taxID": "5423481883",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "ul. Rzemieślnicza 40/10",
+          "postalCode": "15-773",
+          "addressLocality": "Białystok",
+          "addressCountry": "PL"
+        }
+      },
+      "makesOffer": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Serwis amortyzatora przedniego" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Serwis dampera (amortyzatora tylnego)" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Serwis sztycy regulowanej" } }
+      ]
+    }
     </script>
-    <style>
-      body { background-color: #ffffff; color: #111111; }
-      ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: #f1f1f1; }
-      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #ff5a00; }
-    </style>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main style="font-family: sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; line-height: 1.6;">
+        <h1>Oddaj Amora – serwis amortyzatorów rowerowych w Białymstoku</h1>
+        <p>Serwis, naprawa i regulacja amortyzatorów oraz damperów rowerowych marek FOX, RockShox, Marzocchi, Ohlins, SR Suntour, Manitou, DVO, DT Swiss i Cane Creek. 12 miesięcy gwarancji na usługi.</p>
+        <p>Adres: ul. Mickiewicza 39, 15-213 Białystok (w lokalu Galerii Rowerowej)<br />
+        Telefon: <a href="tel:+48884343148">+48 884 343 148</a> (pn–pt 10:00–18:00)<br />
+        E-mail: <a href="mailto:galeriarowerowapl@gmail.com">galeriarowerowapl@gmail.com</a></p>
+        <p>Aby zobaczyć cennik i zgłosić serwis online, włącz obsługę JavaScript w przeglądarce.</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

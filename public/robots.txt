@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /panel-mechanika
+Disallow: /moje-konto
+
+Sitemap: https://oddajamora.pl/sitemap.xml

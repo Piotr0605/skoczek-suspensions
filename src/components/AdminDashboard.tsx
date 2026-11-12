@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { ServiceRequest, ServiceStatus } from '../types';
+import { PricingCategory, ServiceRequest, ServiceStatus } from '../types';
 import { ApiService } from '../services/api';
-import { RefreshCw, Save, Filter, Phone, Archive } from 'lucide-react';
+import PricingEditor from './PricingEditor';
+import { RefreshCw, Save, Filter, Phone, Archive, ClipboardList, Tags } from 'lucide-react';
 
-const AdminDashboard: React.FC = () => {
+interface AdminDashboardProps {
+  pricing: PricingCategory[];
+  pricingSource: 'database' | 'default';
+  pricingUpdatedAt?: string;
+  onPricingSaved: (pricing: PricingCategory[]) => void;
+  onPricingDirtyChange?: (dirty: boolean) => void;
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ pricing, pricingSource, pricingUpdatedAt, onPricingSaved, onPricingDirtyChange }) => {
+  const [section, setSection] = useState<'REQUESTS' | 'PRICING'>('REQUESTS');
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<ServiceStatus | 'ALL' | 'HISTORY'>('ALL');
@@ -97,17 +107,50 @@ const AdminDashboard: React.FC = () => {
              <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded uppercase">Admin</span>
              <h2 className="text-3xl font-black text-black tracking-tight uppercase">Panel Mechanika</h2>
            </div>
-           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi.</p>
+           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi i cennikiem.</p>
         </div>
-        <div className="flex gap-2">
-            <button 
-            onClick={fetchRequests} 
-            className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded text-sm font-bold uppercase hover:border-skoczek-primary hover:text-skoczek-primary transition"
-            >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież
-            </button>
-        </div>
+        {section === 'REQUESTS' && (
+          <div className="flex gap-2">
+              <button 
+              onClick={fetchRequests} 
+              className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded text-sm font-bold uppercase hover:border-skoczek-primary hover:text-skoczek-primary transition"
+              >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież
+              </button>
+          </div>
+        )}
       </div>
+
+      <div className="flex gap-1 border-b border-gray-200" role="tablist" aria-label="Sekcje panelu">
+        {([
+          { id: 'REQUESTS', label: 'Zgłoszenia', icon: <ClipboardList className="w-4 h-4" /> },
+          { id: 'PRICING', label: 'Cennik', icon: <Tags className="w-4 h-4" /> },
+        ] as const).map((tab) => (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={section === tab.id}
+            onClick={() => setSection(tab.id)}
+            className={`flex items-center gap-2 px-5 py-3 -mb-px border-b-2 text-sm font-bold uppercase tracking-wider transition ${
+              section === tab.id ? 'border-skoczek-primary text-skoczek-primary' : 'border-transparent text-gray-500 hover:text-black'
+            }`}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div hidden={section !== 'PRICING'}>
+        <PricingEditor
+          pricing={pricing}
+          source={pricingSource}
+          updatedAt={pricingUpdatedAt}
+          onSaved={onPricingSaved}
+          onDirtyChange={onPricingDirtyChange}
+        />
+      </div>
+
+      {section === 'REQUESTS' && (<>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -154,7 +197,7 @@ const AdminDashboard: React.FC = () => {
                     <td className="p-4 align-top">
                       <div className="font-bold text-black text-sm">{req.clientName || 'Brak danych'}</div>
                       {req.clientPhone && (
-                          <a href={`tel:${req.clientPhone}`} className="inline-flex items-center gap-1 text-xs font-bold text-skoczek-primary hover:underline mt-1">
+                          <a href={`tel:${req.clientPhone.replace(/[^\d+]/g, '')}`} className="inline-flex items-center gap-1 text-xs font-bold text-skoczek-primary hover:underline mt-1">
                               <Phone className="w-3 h-3" /> {req.clientPhone}
                           </a>
                       )}
@@ -196,7 +239,8 @@ const AdminDashboard: React.FC = () => {
                          <span className="absolute left-2 top-2 text-xs text-gray-400">PLN</span>
                        </div>
                     </td>
-                    <td className="p-4 align-top text-center flex gap-2 justify-center">
+                    <td className="p-4 align-top">
+                      <div className="flex gap-2 justify-center">
                        {isEditing && (
                          <button 
                            onClick={() => saveChanges(req.id)}
@@ -216,6 +260,7 @@ const AdminDashboard: React.FC = () => {
                              <Archive className="w-4 h-4" />
                            </button>
                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -224,9 +269,10 @@ const AdminDashboard: React.FC = () => {
           </table>
         </div>
         {filteredRequests.length === 0 && (
-            <div className="p-12 text-center text-gray-500">Brak zgłoszeń w tej kategorii.</div>
+            <div className="p-12 text-center text-gray-500">{loading ? 'Pobieranie zgłoszeń…' : 'Brak zgłoszeń w tej kategorii.'}</div>
         )}
       </div>
+      </>)}
     </div>
   );
 };

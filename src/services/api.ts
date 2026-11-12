@@ -1,7 +1,10 @@
-
 import { supabase } from './supabaseClient';
-import { User, ServiceRequest, ServiceStatus, UserRole, DeliveryMethod } from '../types';
+import { User, ServiceRequest, ServiceStatus, UserRole, DeliveryMethod, PricingCategory } from '../types';
 import { getUserRole } from '../utils/auth';
+import { sanitizePricing } from '../utils/pricing';
+import { PRICING_DATA } from '../constants';
+
+const PRICING_ROW_ID = 'main';
 
 function mapAuthUser(authUser: {
   id: string;
@@ -166,6 +169,47 @@ export const ApiService = {
         .eq('id', id);
 
       if (error) throw new Error('Nie udało się zaktualizować zgłoszenia');
+    },
+  },
+
+  pricing: {
+    /** Returns the price list from the database, or the built-in one when unavailable. */
+    get: async (): Promise<{ data: PricingCategory[]; source: 'database' | 'default'; updatedAt?: string }> => {
+      const { data, error } = await supabase
+        .from('pricing')
+        .select('data, updated_at')
+        .eq('id', PRICING_ROW_ID)
+        .maybeSingle();
+
+      if (error || !data) {
+        if (error) console.warn('Pricing fetch failed, using built-in price list:', error.message);
+        return { data: PRICING_DATA, source: 'default' };
+      }
+
+      const sanitized = sanitizePricing(data.data);
+      if (!sanitized) return { data: PRICING_DATA, source: 'default' };
+      return { data: sanitized, source: 'database', updatedAt: data.updated_at as string };
+    },
+
+    save: async (pricing: PricingCategory[]): Promise<PricingCategory[]> => {
+      await requireAdmin();
+
+      const sanitized = sanitizePricing(pricing);
+      if (!sanitized) throw new Error('Cennik jest pusty lub niepoprawny.');
+
+      const { error } = await supabase
+        .from('pricing')
+        .upsert({ id: PRICING_ROW_ID, data: sanitized }, { onConflict: 'id' });
+
+      if (error) {
+        console.error('Pricing save error:', error);
+        if (error.code === '42P01' || error.code === 'PGRST205') {
+          throw new Error('Brak tabeli "pricing" w bazie. Uruchom migrację supabase/migrations/002_pricing_and_hardening.sql.');
+        }
+        throw new Error('Nie udało się zapisać cennika. Sprawdź uprawnienia administratora.');
+      }
+
+      return sanitized;
     },
   },
 

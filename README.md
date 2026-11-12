@@ -29,11 +29,12 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 
 ### Public Website
 - **Home page** — service presentation, brand and offer information
-- **Pricing** — detailed service price list (front forks, rear shocks/dampers, additional services) grouped by manufacturer (FOX, Rock Shox, Ohlins, Marzocchi, and others)
-- **Contact** — address, phone, email, quick inquiry form
+- **Pricing** — detailed service price list (front forks, rear shocks/dampers, additional services) grouped by manufacturer (FOX, Rock Shox, Ohlins, Marzocchi, and others); loaded from the `pricing` table, with `src/constants.ts` as a fallback
+- **How it works / FAQ** — service steps and frequently asked questions
+- **Contact** — address, phone, email, quick inquiry form (sent via EmailJS, with a `mailto:` fallback)
 - **Terms of Service** and **Privacy Policy (GDPR)**
 - **Google Maps** — service location (requires cookie consent)
-- **Cookie banner** — GDPR compliance when using maps
+- **Cookie banner** — accept all / necessary only; the choice can be changed via "Ustawienia cookies" in the footer
 
 ### Client Area
 - Registration and login (Supabase Auth, minimum 8-character password)
@@ -46,6 +47,12 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 - Filtering: active, new, in progress, ready, history
 - Status and quote updates (PLN)
 - Archiving completed orders
+- **Price list editor** ("Cennik" tab) — edit categories, brands, models and prices; add, remove and reorder rows; restore the default list
+
+### SEO
+- Separate URLs per page (`/zglos-serwis`, `/kontakt`, `/regulamin`, `/polityka-prywatnosci`) with their own title, description and canonical link (`src/routes.ts`)
+- Open Graph / Twitter tags, `LocalBusiness` (BicycleStore) JSON-LD, `robots.txt`, `sitemap.xml`, favicon and web manifest in `public/`
+- `noindex` on account, admin and 404 pages
 
 ---
 
@@ -54,8 +61,8 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 | Layer | Technology |
 |-------|------------|
 | Frontend | React 18, TypeScript |
-| Bundler | Vite 5 |
-| Styling | Tailwind CSS (CDN) |
+| Bundler | Vite 7 |
+| Styling | Tailwind CSS 3 (built with PostCSS) |
 | Icons | Lucide React |
 | Backend / Auth | Supabase (PostgreSQL + Auth + RLS) |
 | Email | EmailJS |
@@ -66,7 +73,7 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 
 ## Architecture
 
-The application is a **SPA** (Single Page Application) with view-based navigation (`HOME`, `FORM`, `DASHBOARD`, `ADMIN`, `CONTACT`, `REGULATIONS`, `PRIVACY`).
+The application is a **SPA** (Single Page Application). Each view has its own URL handled with the History API (`src/routes.ts`); `vercel.json` rewrites all paths to `index.html`.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -113,8 +120,13 @@ The application uses multi-layer data protection:
 | **Input validation** | Form field length limits, minimum password length |
 | **Environment variables** | API keys in `VITE_*` env vars instead of hardcoded in components |
 | **Generic error messages** | Registration does not expose server error details |
+| **HTTP security headers** | `vercel.json`: Content-Security-Policy, HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy |
+| **Insert restrictions** | Clients can only create requests with the initial status and no quote; DB-level length limits |
+| **Price list** | `pricing` table readable by everyone, writable only by `is_admin()`; data is sanitized before saving |
 
-SQL migration with RLS policies: `supabase/migrations/001_security_rls.sql`
+SQL migrations: `supabase/migrations/001_security_rls.sql`, `supabase/migrations/002_pricing_and_hardening.sql`
+
+> When adding a new external service (scripts, API, iframes), add its domain to the `Content-Security-Policy` header in `vercel.json`.
 
 Detailed deployment guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
@@ -124,7 +136,10 @@ Detailed deployment guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
 ```
 skoczek-suspensions/
-├── index.html                  # HTML entry point, Tailwind config
+├── index.html                  # HTML entry point, SEO meta tags, JSON-LD
+├── vercel.json                 # SPA rewrites, security headers, caching
+├── tailwind.config.js / postcss.config.js
+├── public/                     # favicon, og-image, robots.txt, sitemap.xml, manifest
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
@@ -133,9 +148,12 @@ skoczek-suspensions/
 ├── DEPLOY_SECURITY.md          # Security deployment guide
 ├── supabase/
 │   └── migrations/
-│       └── 001_security_rls.sql  # RLS + ADMIN role migration
+│       ├── 001_security_rls.sql  # RLS + ADMIN role migration
+│       └── 002_pricing_and_hardening.sql  # pricing table + insert hardening
 └── src/
     ├── index.tsx               # React app mount
+    ├── index.css               # Tailwind entry + global styles
+    ├── routes.ts               # URL ↔ view mapping, per-page SEO meta
     ├── vite-env.d.ts           # VITE_* variable types
     ├── config.ts               # Supabase and EmailJS configuration
     ├── App.tsx                 # Main component, navigation, layout
@@ -143,22 +161,24 @@ skoczek-suspensions/
     ├── constants.ts            # Contact info, pricing, terms, privacy policy
     ├── utils/
     │   ├── auth.ts             # Role lookup from app_metadata
+    │   ├── pricing.ts          # Price list sanitization / formatting
     │   └── validation.ts       # Form and password validation
     ├── components/
     │   ├── ServiceForm.tsx     # Service request form
     │   ├── Dashboard.tsx       # Client dashboard
     │   ├── AdminDashboard.tsx  # Mechanic/admin dashboard
+    │   ├── PricingEditor.tsx   # Admin price list editor
     │   └── CookieBanner.tsx    # Cookie consent banner
     └── services/
         ├── supabaseClient.ts   # Supabase client
-        └── api.ts              # API layer (auth + requests)
+        └── api.ts              # API layer (auth + requests + pricing)
 ```
 
 ---
 
 ## Requirements
 
-- **Node.js** 18 or newer
+- **Node.js** 20.19 or newer
 - **npm** (or yarn / pnpm)
 - **Supabase** account with configured database, authentication, and RLS migration applied
 - **EmailJS** account (for email notifications about new requests)
@@ -237,7 +257,7 @@ The application is hosted on **Vercel** and builds automatically on `git push` t
 
 ### Deployment Order (Important)
 
-1. **Supabase** — run `supabase/migrations/001_security_rls.sql` in the SQL Editor
+1. **Supabase** — run `supabase/migrations/001_security_rls.sql`, then `002_pricing_and_hardening.sql` in the SQL Editor
 2. **Verify** — the admin account has `"role": "ADMIN"` in App Metadata
 3. **Vercel** — set `VITE_*` variables (optional but recommended)
 4. **Deploy** — `git push origin main`
@@ -273,6 +293,17 @@ Full step-by-step guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 | `estimated_cost` | numeric | Estimated quote (PLN) |
 | `created_at` | timestamptz | Creation timestamp |
 
+### `pricing` Table
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | text | Always `main` (single row) |
+| `data` | jsonb | Array of price list categories (`PricingCategory[]`) |
+| `updated_at` | timestamptz | Set automatically on save |
+| `updated_by` | uuid | Admin who saved the price list |
+
+Until the first save from the admin panel, the site shows the built-in price list from `src/constants.ts`.
+
 ### Row Level Security (RLS)
 
 After running the `001_security_rls.sql` migration, these policies apply:
@@ -284,6 +315,8 @@ After running the `001_security_rls.sql` migration, these policies apply:
 | INSERT (own request) | Yes | Yes |
 | UPDATE status / quote | No | Yes |
 | DELETE | No | Yes |
+| SELECT `pricing` | Yes (also anonymous) | Yes |
+| INSERT / UPDATE `pricing` | No | Yes |
 
 The `is_admin()` function checks the role exclusively in the JWT `app_metadata`.
 
@@ -316,7 +349,8 @@ The `is_admin()` function checks the role exclusively in the JWT `app_metadata`.
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Vite development server |
-| `npm run build` | Build to `dist/` |
+| `npm run typecheck` | TypeScript check |
+| `npm run build` | Type check + build to `dist/` |
 | `npm run preview` | Local preview of the production build |
 
 ---

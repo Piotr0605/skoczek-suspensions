@@ -51,9 +51,16 @@ export interface PricingBrand {
   rows: PricingRow[];
 }
 
+export interface PricingService {
+  name: string;
+  price: string;
+}
+
+export type PricingCategoryId = 'FRONT' | 'REAR' | 'OTHER';
+
 export interface PricingCategory {
-  id: 'FRONT' | 'REAR' | 'OTHER';
+  id: PricingCategoryId;
   title: string;
   brands?: PricingBrand[];
-  services?: { name: string; price: string }[];
+  services?: PricingService[];
 }
