@@ -38,6 +38,25 @@ export function validateServiceRequest(data: {
   return null;
 }
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validateContactInquiry(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}): string | null {
+  const name = data.name.trim();
+  if (!name || name.length > MAX_NAME) return 'Podaj swoje imię.';
+  const email = data.email.trim();
+  if (!EMAIL_PATTERN.test(email) || email.length > 150) return 'Podaj prawidłowy adres e-mail.';
+  const subject = data.subject.trim();
+  if (!subject || subject.length > 150) return 'Podaj temat wiadomości (max 150 znaków).';
+  const message = data.message.trim();
+  if (message.length < 10 || message.length > MAX_DESCRIPTION) return 'Wiadomość musi mieć od 10 do 2000 znaków.';
+  return null;
+}
+
 export function sanitizeServiceRequest(data: {
   componentModel: string;
   problemDescription: string;

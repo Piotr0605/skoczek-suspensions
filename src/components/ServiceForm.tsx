@@ -11,9 +11,11 @@ interface ServiceFormProps {
   user: User | null;
   onSuccess: () => void;
   onRequestLogin: () => void;
+  onOpenRegulations: () => void;
+  onOpenPrivacy: () => void;
 }
 
-const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLogin }) => {
+const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLogin, onOpenRegulations, onOpenPrivacy }) => {
   const [formData, setFormData] = useState({
     componentModel: '',
     problemDescription: '',
@@ -123,12 +125,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
   return (
     <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-xl relative">
       <div className="border-b border-gray-100 pb-6 mb-6">
-        <h2 className="text-2xl font-black text-black flex items-center gap-3 uppercase tracking-tight">
+        <h1 className="text-2xl font-black text-black flex items-center gap-3 uppercase tracking-tight">
             <div className="bg-skoczek-primary text-white p-2 rounded">
                 <Truck className="w-5 h-5" />
             </div>
-            Formularz Zgłoszeniowy
-        </h2>
+            Zgłoś serwis amortyzatora
+        </h1>
         <p className="text-gray-500 mt-2 ml-12 text-sm">Wypełnij szczegóły dotyczące sprzętu i usterki.</p>
       </div>
 
@@ -149,21 +151,23 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         {user && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                <label className="text-xs text-gray-400 font-bold uppercase block mb-1">Klient</label>
+                <span className="text-xs text-gray-400 font-bold uppercase block mb-1">Klient</span>
                 <div className="flex items-center gap-2 text-gray-900 font-bold">
                   <UserIcon className="w-4 h-4 text-gray-400" /> {user.name}
                 </div>
              </div>
              <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                <label className="text-xs text-gray-400 font-bold uppercase block mb-1">Kontakt</label>
+                <span className="text-xs text-gray-400 font-bold uppercase block mb-1">Kontakt</span>
                 <div className="text-gray-900 font-bold">{user.phone}</div>
              </div>
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Model Amortyzatora / Dampera</label>
+          <label htmlFor="componentModel" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Model Amortyzatora / Dampera</label>
           <input
+            id="componentModel"
+            maxLength={200}
             type="text"
             name="componentModel"
             value={formData.componentModel}
@@ -175,8 +179,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Opis Problemu</label>
+          <label htmlFor="problemDescription" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Opis Problemu</label>
           <textarea
+            id="problemDescription"
+            maxLength={2000}
             name="problemDescription"
             value={formData.problemDescription}
             onChange={handleChange}
@@ -189,29 +195,29 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Sposób Dostarczenia</label>
+             <span className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Sposób Dostarczenia</span>
              <div className="flex gap-4">
-               <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
+               <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-skoczek-primary bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
                  <input 
                     type="radio" 
                     name="deliveryMethod" 
                     value={DeliveryMethod.PERSONAL}
                     checked={formData.deliveryMethod === DeliveryMethod.PERSONAL}
                     onChange={handleChange}
-                    className="hidden"
+                    className="sr-only"
                  />
                  <div className="text-sm font-bold">Osobiście</div>
                  {formData.deliveryMethod === DeliveryMethod.PERSONAL && <Check className="w-4 h-4 ml-auto" />}
                </label>
                
-               <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
+               <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-skoczek-primary bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
                  <input 
                     type="radio" 
                     name="deliveryMethod" 
                     value={DeliveryMethod.SHIPPING}
                     checked={formData.deliveryMethod === DeliveryMethod.SHIPPING}
                     onChange={handleChange}
-                    className="hidden"
+                    className="sr-only"
                  />
                  <div className="text-sm font-bold">Wysyłka</div>
                  {formData.deliveryMethod === DeliveryMethod.SHIPPING && <Check className="w-4 h-4 ml-auto" />}
@@ -220,11 +226,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Preferowany Termin</label>
+            <label htmlFor="preferredDate" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Preferowany Termin</label>
             <div className="relative">
               <Calendar className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
               <input
+                id="preferredDate"
                 type="date"
+                min={new Date().toISOString().slice(0, 10)}
                 name="preferredDate"
                 value={formData.preferredDate}
                 onChange={handleChange}
@@ -235,13 +243,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         </div>
 
         <div className="bg-gray-50 p-5 rounded border border-gray-200 text-sm">
-          <h4 className="text-black font-bold uppercase text-xs mb-3">Regulamin Serwisu i Polityka Prywatności</h4>
+          <h3 className="text-black font-bold uppercase text-xs mb-3">Regulamin Serwisu i Polityka Prywatności</h3>
           <div className="mb-4 h-32 overflow-y-auto custom-scrollbar text-gray-600 pr-2 border border-gray-200 bg-white p-3 rounded text-xs whitespace-pre-wrap">
             {FULL_REGULATIONS}
           </div>
           
           <div className="space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer group select-none">
+              <label className="flex items-start gap-3 cursor-pointer group select-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-skoczek-primary rounded">
                  <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptTerms ? 'border-skoczek-primary bg-skoczek-primary' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
                     {formData.acceptTerms && <Check className="w-3 h-3 text-white" />}
                  </div>
@@ -250,14 +258,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
                   name="acceptTerms"
                   checked={formData.acceptTerms}
                   onChange={handleCheckbox}
-                  className="hidden"
+                  className="sr-only"
                 />
                 <span className={`text-xs ${error && !formData.acceptTerms ? "text-red-600 font-bold" : "text-gray-500 group-hover:text-gray-800"}`}>
-                  Oświadczam, że zapoznałem się z Regulaminem Serwisu i akceptuję jego warunki.
+                  Oświadczam, że zapoznałem się z{' '}
+                  <button type="button" onClick={(e) => { e.preventDefault(); onOpenRegulations(); }} className="underline font-bold hover:text-skoczek-primary">Regulaminem Serwisu</button>
+                  {' '}i akceptuję jego warunki.
                 </span>
               </label>
 
-              <label className="flex items-start gap-3 cursor-pointer group select-none">
+              <label className="flex items-start gap-3 cursor-pointer group select-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-skoczek-primary rounded">
                  <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptPrivacy ? 'border-skoczek-primary bg-skoczek-primary' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
                     {formData.acceptPrivacy && <Check className="w-3 h-3 text-white" />}
                  </div>
@@ -266,10 +276,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
                   name="acceptPrivacy"
                   checked={formData.acceptPrivacy}
                   onChange={handleCheckbox}
-                  className="hidden"
+                  className="sr-only"
                 />
                 <span className={`text-xs ${error && !formData.acceptPrivacy ? "text-red-600 font-bold" : "text-gray-500 group-hover:text-gray-800"}`}>
-                  Zapoznałem się z Polityką Prywatności serwisu (RODO).
+                  Zapoznałem się z{' '}
+                  <button type="button" onClick={(e) => { e.preventDefault(); onOpenPrivacy(); }} className="underline font-bold hover:text-skoczek-primary">Polityką Prywatności</button>
+                  {' '}serwisu (RODO).
                 </span>
               </label>
           </div>

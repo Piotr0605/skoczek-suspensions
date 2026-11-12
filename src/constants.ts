@@ -13,6 +13,33 @@ export const REGULATION_POINTS = [
   "Nieodebranie sprzętu w terminie 30 dni od powiadomienia o zakończeniu serwisu skutkuje naliczeniem opłaty magazynowej w wysokości 5 PLN za każdą dobę."
 ];
 
+export const FAQ_ITEMS: { question: string; answer: string }[] = [
+  {
+    question: 'Jak długo trwa wycena serwisu amortyzatora?',
+    answer: 'Wycenę przygotowujemy standardowo do 3 dni roboczych od dostarczenia sprzętu. Prace rozpoczynamy dopiero po jej akceptacji przez Ciebie.',
+  },
+  {
+    question: 'Czy mogę wysłać amortyzator kurierem?',
+    answer: 'Tak. Zgłoś serwis przez formularz, wybierz wysyłkę i dobrze zabezpiecz sprzęt na czas transportu. Po opłaceniu usługi odsyłamy go w ciągu 1 dnia roboczego.',
+  },
+  {
+    question: 'Ile kosztuje serwis amortyzatora?',
+    answer: 'Orientacyjne ceny dla poszczególnych marek i modeli znajdziesz w cenniku powyżej. Ostateczny koszt zależy od stanu sprzętu i potrzebnych części – o każdej zmianie wyceny poinformujemy Cię przed wykonaniem prac.',
+  },
+  {
+    question: 'Czy udzielacie gwarancji na serwis?',
+    answer: 'Tak, na wykonaną usługę i zamontowane części udzielamy 12 miesięcy gwarancji, liczonej od dnia wydania lub wysłania sprzętu.',
+  },
+  {
+    question: 'Co jeśli zrezygnuję po otrzymaniu wyceny?',
+    answer: 'W razie rezygnacji po przedstawieniu wyceny pobieramy opłatę za diagnozę w wysokości 80 zł brutto (plus koszt ewentualnej wysyłki zwrotnej). Przy realizacji serwisu opłata ta jest wliczona w cenę.',
+  },
+  {
+    question: 'Jakie marki serwisujecie?',
+    answer: 'Serwisujemy amortyzatory i dampery FOX, RockShox, Marzocchi, Ohlins, SR Suntour, Manitou, DVO, DT Swiss, Cannondale i Cane Creek, a także sztyce regulowane.',
+  },
+];
+
 export const PRICING_DATA: PricingCategory[] = [
   {
     id: 'FRONT',
