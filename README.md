@@ -1,6 +1,6 @@
 # Oddaj Amora — Suspension Service
 
-A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authorized bicycle suspension and damper service center. It allows customers to submit service requests online, track repair status, and lets service staff manage work orders.
+A web application for **Oddaj Amora** (Skoczek Suspension Tomasz Pierzchało, Łapy near Białystok), an authorized bicycle suspension and damper service center. It allows customers to submit service requests online, track repair status, and lets service staff manage work orders.
 
 **Author:** Piotr Sienkiewicz
 
@@ -413,4 +413,4 @@ The `is_admin()` function checks the role exclusively in the JWT `app_metadata`.
 
 ## License
 
-Private project — Galeria Rowerowa Sp. z o.o. / Oddaj Amora.
+Private project — Skoczek Suspension Tomasz Pierzchało (NIP 5423158283) / Oddaj Amora.

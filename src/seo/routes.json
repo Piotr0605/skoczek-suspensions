@@ -7,8 +7,8 @@
       "path": "/",
       "view": "HOME",
       "label": "Start",
-      "title": "Serwis amortyzatorów rowerowych Białystok | Oddaj Amora",
-      "description": "Profesjonalny serwis amortyzatorów i damperów rowerowych w Białymstoku. RockShox, FOX, Manitou, Öhlins, Marzocchi, SR Suntour. Darmowa wycena, 12 miesięcy gwarancji, wysyłka kurierem z całej Polski.",
+      "title": "Serwis amortyzatorów rowerowych Łapy, Białystok | Oddaj Amora",
+      "description": "Profesjonalny serwis amortyzatorów i damperów rowerowych - Łapy koło Białegostoku. RockShox, FOX, Manitou, Öhlins, Marzocchi, SR Suntour. Darmowa wycena, 12 miesięcy gwarancji, wysyłka kurierem z całej Polski.",
       "index": true,
       "priority": 1.0,
       "changefreq": "weekly"
@@ -28,7 +28,7 @@
       "view": "FORM",
       "label": "Zgłoś serwis",
       "title": "Zgłoś serwis amortyzatora online | Oddaj Amora",
-      "description": "Wypełnij formularz zgłoszenia serwisowego amortyzatora lub dampera. Wyceniamy do 3 dni roboczych, odbiór osobisty w Białymstoku lub wysyłka kurierem z całej Polski.",
+      "description": "Wypełnij formularz zgłoszenia serwisowego amortyzatora lub dampera. Wyceniamy do 3 dni roboczych, odbiór osobisty w Łapach koło Białegostoku lub wysyłka kurierem z całej Polski.",
       "index": true,
       "priority": 0.9,
       "changefreq": "monthly"
@@ -37,8 +37,8 @@
       "path": "/kontakt",
       "view": "CONTACT",
       "label": "Kontakt",
-      "title": "Kontakt - serwis amortyzatorów Białystok | Oddaj Amora",
-      "description": "Skontaktuj się z serwisem Oddaj Amora: ul. Mickiewicza 39 w Białymstoku, tel. +48 884 343 148, e-mail galeriarowerowapl@gmail.com. Czynne od poniedziałku do piątku 10:00-18:00.",
+      "title": "Kontakt - serwis amortyzatorów Łapy, Białystok | Oddaj Amora",
+      "description": "Skontaktuj się z serwisem Oddaj Amora: ul. Główna 123 w Łapach (powiat białostocki), tel. +48 884 343 148, e-mail tomasze4@gmail.com. Czynne od poniedziałku do piątku 10:00-18:00.",
       "index": true,
       "priority": 0.8,
       "changefreq": "yearly"

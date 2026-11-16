@@ -1,9 +1,24 @@
 import { PricingCategory } from './types';
 
 export const APP_NAME = "Oddaj Amora";
-export const ADDRESS = "ul. Mickiewicza 39, 15-213 Białystok";
+
+/** Operator of the service and of this website (CEIDG sole proprietorship). */
+export const COMPANY = {
+  name: "Skoczek Suspension Tomasz Pierzchało",
+  shortName: "Skoczek Suspension",
+  nip: "5423158283",
+  regon: "523948292",
+  street: "ul. Główna 123",
+  postalCode: "18-100",
+  city: "Łapy",
+  region: "podlaskie",
+  latitude: 52.9918,
+  longitude: 22.8655,
+} as const;
+
+export const ADDRESS = "ul. Główna 123, 18-100 Łapy";
 export const PHONE = "+48 884 343 148";
-export const EMAIL = "galeriarowerowapl@gmail.com";
+export const EMAIL = "tomasze4@gmail.com";
 
 export const REGULATION_POINTS = [
   "Akceptacja niniejszego regulaminu jest warunkiem koniecznym przyjęcia sprzętu do serwisu.",
@@ -183,15 +198,16 @@ export const PRICING_DATA: PricingCategory[] = [
 ];
 
 export const FULL_REGULATIONS = `REGULAMIN SERWISU AMORTYZATORÓW ROWEROWYCH oddajamora.pl
-Obowiązuje od dnia [24.11.2025]
+Obowiązuje od dnia 16.11.2026
 
 I. Postanowienia Ogólne
 1.1. Właściciel Serwisu:
-• Pełna nazwa: GALERIA ROWEROWA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ
-• Adres rejestrowy (siedziby): UL. RZEMIEŚLNICZA 40 / 10, 15-773 BIAŁYSTOK
-• NIP: 5423481883
-• Numer KRS: 0001091783
-• Adres e-mail: galeriarowerowapl@gmail.com
+• Pełna nazwa: SKOCZEK SUSPENSION TOMASZ PIERZCHAŁO
+• Forma prawna: jednoosobowa działalność gospodarcza wpisana do Centralnej Ewidencji i Informacji o Działalności Gospodarczej (CEIDG)
+• Adres prowadzenia działalności i punktu serwisowego: UL. GŁÓWNA 123, 18-100 ŁAPY
+• NIP: 5423158283
+• REGON: 523948292
+• Adres e-mail: tomasze4@gmail.com
 • Numer telefonu: 884 343 148
 
 1.2. Zakres Regulaminu: Regulamin określa zasady przyjmowania, diagnozowania, wyceny, realizacji i odbioru usług serwisowych (zwanych dalej "Usługą" lub "Serwisem") amortyzatorów rowerowych ("Amortyzator") świadczonych przez Serwis oddajamora.pl.
@@ -199,7 +215,7 @@ I. Postanowienia Ogólne
 1.3. Klient: Osoba fizyczna, osoba prawna lub jednostka organizacyjna bez osobowości prawnej, zlecająca wykonanie Usługi Serwisowej.
 
 II. Przyjmowanie Zlecenia Serwisowego
-2.1. Złożenie Zlecenia: Klient składa zlecenie serwisowe poprzez formularz na stronie oddajamora.pl, drogą e-mailową lub osobiście w punkcie Serwisu.
+2.1. Złożenie Zlecenia: Klient składa zlecenie serwisowe poprzez formularz na stronie oddajamora.pl, drogą e-mailową lub osobiście w punkcie Serwisu przy ul. Głównej 123 w Łapach.
 
 2.2. Wysyłka Sprzętu: Klient zobowiązuje się do wysłania Amortyzatora do Serwisu na własny koszt i ryzyko, odpowiednio zabezpieczonego na czas transportu, wraz z potwierdzeniem złożenia zlecenia (jeśli jest wymagane).
 
@@ -254,7 +270,7 @@ VI. Postanowienia Końcowe
 • Prawo odstąpienia od umowy nie przysługuje Klientowi, jeżeli Serwis wykonał w pełni Usługę za wyraźną zgodą Klienta, który został poinformowany o utracie tego prawa z chwilą spełnienia świadczenia (zgodnie z art. 38 pkt 1 Ustawy o Prawach Konsumenta).
 
 6.2. Ochrona Danych Osobowych:
-• Administratorem danych osobowych jest GALERIA ROWEROWA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ.
+• Administratorem danych osobowych jest SKOCZEK SUSPENSION TOMASZ PIERZCHAŁO.
 • Szczegółowe zasady przetwarzania danych określa odrębny dokument Polityka Prywatności Serwisu oddajamora.pl, dostępny na stronie internetowej.
 
 6.3. Postanowienia Końcowe:
@@ -268,10 +284,10 @@ Dokument ten wypełnia obowiązek informacyjny wynikający z art. 13 Rozporządz
 
 I. Administrator Danych Osobowych
 Administratorem Twoich danych osobowych jest:
-Galeria Rowerowa Sp. z o.o. ul. Rzemieślnicza 40/10 15-773 Białystok NIP: 5423481883 REGON: 527980329
+Skoczek Suspension Tomasz Pierzchało, ul. Główna 123, 18-100 Łapy, NIP: 5423158283, REGON: 523948292 (jednoosobowa działalność gospodarcza wpisana do CEIDG).
 
 Kontakt z Administratorem jest możliwy za pośrednictwem:
-Poczty elektronicznej: galeriarowerowapl@gmail.com
+Poczty elektronicznej: tomasze4@gmail.com
 Telefonu: 884 343 148
 
 II. Cele i podstawy prawne przetwarzania danych

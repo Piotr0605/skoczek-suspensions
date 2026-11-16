@@ -123,8 +123,8 @@ const MapComponent: React.FC<{ consent: boolean; onAccept: () => void }> = ({ co
 
   return (
     <iframe
-      title="Lokalizacja serwisu Oddaj Amora - ul. Mickiewicza 39, Białystok"
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2394.026466759714!2d23.1678!3d53.1325!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471ffc0f00000001%3A0x1234567890abcdef!2sMickiewicza%2039%2C%2015-213%20Bia%C5%82ystok!5e0!3m2!1spl!2spl!4v1620000000000!5m2!1spl!2spl"
+      title="Lokalizacja serwisu Oddaj Amora - ul. Główna 123, 18-100 Łapy"
+      src="https://www.google.com/maps?q=52.9918,22.8655&z=16&hl=pl&output=embed"
       width="100%"
       height="100%"
       style={{ border: 0 }}
@@ -144,7 +144,7 @@ const ContactDetails: React.FC = () => (
       <div>
         <h2 className="font-bold uppercase text-sm text-gray-400 mb-1">Adres</h2>
         <p className="font-bold text-lg text-black">{ADDRESS}</p>
-        <p className="text-sm text-gray-500">Białystok, woj. podlaskie (w lokalu Galerii Rowerowej)</p>
+        <p className="text-sm text-gray-500">Łapy, powiat białostocki, woj. podlaskie</p>
       </div>
     </div>
 
@@ -665,7 +665,7 @@ const App: React.FC = () => {
               <div className="max-w-7xl mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-12">
                 <div className="flex-1 text-center md:text-left">
                   <p className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 font-bold text-xs px-3 py-1 rounded mb-6 uppercase tracking-widest">
-                    <CheckCircle className="w-3 h-3 text-skoczek-primary" aria-hidden="true" /> Białystok · Autoryzowany punkt serwisowy
+                    <CheckCircle className="w-3 h-3 text-skoczek-primary" aria-hidden="true" /> Łapy k. Białegostoku · Autoryzowany punkt serwisowy
                   </p>
 
                   <h1 className="text-4xl md:text-6xl font-black text-black uppercase leading-tight tracking-tight mb-6 pl-0 md:pl-6 border-l-0 md:border-l-4 border-skoczek-primary">
@@ -675,8 +675,8 @@ const App: React.FC = () => {
                   <p className="text-gray-600 text-lg mb-8 max-w-xl font-medium leading-relaxed">
                     Kompleksowo zajmiemy się zawieszeniem w Twoim rowerze. Serwis olejowy, wymiana
                     uszczelek, naprawa i ustawienie amortyzatorów oraz damperów marek FOX, RockShox,
-                    Marzocchi, Öhlins, Manitou i SR Suntour. Przyjmujemy sprzęt osobiście w Białymstoku
-                    i kurierem z całej Polski.
+                    Marzocchi, Öhlins, Manitou i SR Suntour. Przyjmujemy sprzęt osobiście w Łapach
+                    koło Białegostoku i kurierem z całej Polski.
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -723,7 +723,7 @@ const App: React.FC = () => {
                   <MapPin className="w-8 h-8 text-skoczek-primary mb-1" aria-hidden="true" />
                   <div>
                     <h2 className="font-bold text-black uppercase text-sm">Lokalizacja</h2>
-                    <p className="text-xs text-gray-500 mt-1">Centrum Białegostoku</p>
+                    <p className="text-xs text-gray-500 mt-1">Łapy k. Białegostoku</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3">
@@ -800,7 +800,7 @@ const App: React.FC = () => {
                 <ol className="grid md:grid-cols-4 gap-6">
                   {[
                     { icon: <Send className="w-6 h-6" aria-hidden="true" />, title: '1. Zgłoszenie', text: 'Wypełniasz formularz serwisowy online - opisujesz model i usterkę.' },
-                    { icon: <Truck className="w-6 h-6" aria-hidden="true" />, title: '2. Dostarczenie', text: 'Przywozisz sprzęt na ul. Mickiewicza 39 w Białymstoku lub wysyłasz kurierem.' },
+                    { icon: <Truck className="w-6 h-6" aria-hidden="true" />, title: '2. Dostarczenie', text: 'Przywozisz sprzęt na ul. Główną 123 w Łapach lub wysyłasz kurierem.' },
                     { icon: <Clock className="w-6 h-6" aria-hidden="true" />, title: '3. Diagnoza i wycena', text: 'W ciągu maksymalnie 3 dni roboczych otrzymujesz szczegółową wycenę do akceptacji.' },
                     { icon: <CheckCircle className="w-6 h-6" aria-hidden="true" />, title: '4. Naprawa i zwrot', text: 'Po akceptacji wykonujemy serwis i odsyłamy sprzęt - z 12-miesięczną gwarancją.' },
                   ].map((step) => (
@@ -858,7 +858,7 @@ const App: React.FC = () => {
                       </div>
                       <div>
                         <h3 className="font-bold text-lg">Adres Serwisu</h3>
-                        <p className="text-gray-400 mt-1 text-sm leading-relaxed">ul. Mickiewicza 39<br/>15-213 Białystok<br/>(w lokalu Galerii Rowerowej)</p>
+                        <p className="text-gray-400 mt-1 text-sm leading-relaxed">ul. Główna 123<br/>18-100 Łapy<br/>(powiat białostocki)</p>
                       </div>
                     </div>
 
@@ -965,8 +965,8 @@ const App: React.FC = () => {
                   <div>
                     <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-2">Kontakt</h1>
                     <p className="text-gray-500">
-                      Serwis amortyzatorów rowerowych Oddaj Amora - Białystok, ul. Mickiewicza 39.
-                      Wybierz preferowaną formę kontaktu.
+                      Serwis amortyzatorów rowerowych Oddaj Amora - Łapy koło Białegostoku,
+                      ul. Główna 123. Wybierz preferowaną formę kontaktu.
                     </p>
                   </div>
 
@@ -1042,7 +1042,7 @@ const App: React.FC = () => {
           <div>
             <p className="text-xl font-black text-black uppercase tracking-tighter">ODDAJ <span className="text-skoczek-primary">AMORA</span></p>
             <p className="text-gray-500 text-sm mt-3 leading-relaxed">
-              Profesjonalny serwis amortyzatorów i damperów rowerowych w Białymstoku.
+              Profesjonalny serwis amortyzatorów i damperów rowerowych w Łapach koło Białegostoku.
               Przyjmujemy sprzęt osobiście oraz kurierem z całej Polski.
             </p>
           </div>
@@ -1050,7 +1050,7 @@ const App: React.FC = () => {
           <div>
             <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Dane kontaktowe</h2>
             <address className="not-italic text-sm text-gray-600 space-y-2">
-              <p>ul. Mickiewicza 39, 15-213 Białystok</p>
+              <p>ul. Główna 123, 18-100 Łapy</p>
               <p>
                 <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="hover:text-skoczek-primary transition font-bold">{PHONE}</a>
               </p>
@@ -1075,7 +1075,7 @@ const App: React.FC = () => {
 
         <div className="max-w-7xl mx-auto px-4 mt-10 pt-8 border-t border-gray-100 text-center text-gray-400 text-xs space-y-1">
           <p>&copy; {new Date().getFullYear()} Oddaj Amora - {SITE_URL.replace(/^https?:\/\//, '')}</p>
-          <p>Galeria Rowerowa Sp. z o.o., ul. Rzemieślnicza 40/10, 15-773 Białystok, NIP 5423481883, KRS 0001091783</p>
+          <p>Skoczek Suspension Tomasz Pierzchało, ul. Główna 123, 18-100 Łapy, NIP 5423158283, REGON 523948292</p>
         </div>
       </footer>
 
