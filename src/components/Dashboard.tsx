@@ -49,7 +49,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 gap-4">
         <div>
-           <h2 className="text-3xl font-black text-black tracking-tight uppercase">Panel Klienta</h2>
+           <h1 className="text-3xl font-black text-black tracking-tight uppercase">Panel Klienta</h1>
            <p className="text-gray-500 mt-1 text-sm">Historia Twoich napraw i statusy bieżące.</p>
         </div>
         <button 

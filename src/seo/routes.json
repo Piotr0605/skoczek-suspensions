@@ -1,0 +1,87 @@
+{
+  "siteUrl": "https://oddajamora.pl",
+  "siteName": "Oddaj Amora",
+  "defaultImage": "/og-image.png",
+  "routes": [
+    {
+      "path": "/",
+      "view": "HOME",
+      "label": "Start",
+      "title": "Serwis amortyzatorów rowerowych Białystok | Oddaj Amora",
+      "description": "Profesjonalny serwis amortyzatorów i damperów rowerowych w Białymstoku. RockShox, FOX, Manitou, Öhlins, Marzocchi, SR Suntour. Darmowa wycena, 12 miesięcy gwarancji, wysyłka kurierem z całej Polski.",
+      "index": true,
+      "priority": 1.0,
+      "changefreq": "weekly"
+    },
+    {
+      "path": "/cennik",
+      "view": "PRICING",
+      "label": "Cennik",
+      "title": "Cennik serwisu amortyzatorów i damperów | Oddaj Amora",
+      "description": "Aktualny cennik serwisu amortyzatorów przednich, damperów i sztyc regulowanych. Ceny serwisu RockShox, FOX, Manitou, Öhlins, DT Swiss, SR Suntour, DVO, Cane Creek i Marzocchi.",
+      "index": true,
+      "priority": 0.9,
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/zglos-serwis",
+      "view": "FORM",
+      "label": "Zgłoś serwis",
+      "title": "Zgłoś serwis amortyzatora online | Oddaj Amora",
+      "description": "Wypełnij formularz zgłoszenia serwisowego amortyzatora lub dampera. Wyceniamy do 3 dni roboczych, odbiór osobisty w Białymstoku lub wysyłka kurierem z całej Polski.",
+      "index": true,
+      "priority": 0.9,
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/kontakt",
+      "view": "CONTACT",
+      "label": "Kontakt",
+      "title": "Kontakt - serwis amortyzatorów Białystok | Oddaj Amora",
+      "description": "Skontaktuj się z serwisem Oddaj Amora: ul. Mickiewicza 39 w Białymstoku, tel. +48 884 343 148, e-mail galeriarowerowapl@gmail.com. Czynne od poniedziałku do piątku 10:00-18:00.",
+      "index": true,
+      "priority": 0.8,
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/regulamin",
+      "view": "REGULATIONS",
+      "label": "Regulamin",
+      "title": "Regulamin serwisu amortyzatorów | Oddaj Amora",
+      "description": "Regulamin serwisu amortyzatorów rowerowych oddajamora.pl: zasady przyjmowania zleceń, wyceny, płatności, wysyłki zwrotnej, reklamacji oraz 12-miesięcznej gwarancji na usługę.",
+      "index": true,
+      "priority": 0.3,
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/polityka-prywatnosci",
+      "view": "PRIVACY",
+      "label": "Polityka prywatności",
+      "title": "Polityka prywatności i RODO | Oddaj Amora",
+      "description": "Polityka prywatności serwisu oddajamora.pl: administrator danych, cele i podstawy prawne przetwarzania, odbiorcy danych, okres przechowywania, prawa użytkownika i pliki cookies.",
+      "index": true,
+      "priority": 0.3,
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/panel-klienta",
+      "view": "DASHBOARD",
+      "label": "Moje konto",
+      "title": "Panel klienta | Oddaj Amora",
+      "description": "Panel klienta serwisu Oddaj Amora - status i historia Twoich napraw.",
+      "index": false,
+      "priority": 0.1,
+      "changefreq": "never"
+    },
+    {
+      "path": "/panel-mechanika",
+      "view": "ADMIN",
+      "label": "Panel mechanika",
+      "title": "Panel mechanika | Oddaj Amora",
+      "description": "Panel administracyjny serwisu Oddaj Amora.",
+      "index": false,
+      "priority": 0.1,
+      "changefreq": "never"
+    }
+  ]
+}

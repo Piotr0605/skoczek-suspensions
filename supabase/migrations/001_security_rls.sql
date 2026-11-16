@@ -49,6 +49,14 @@ DROP POLICY IF EXISTS "Users insert own requests" ON public.service_requests;
 DROP POLICY IF EXISTS "Admins update requests" ON public.service_requests;
 DROP POLICY IF EXISTS "Admins delete requests" ON public.service_requests;
 
+-- Legacy policy names from the first version of the database. They tested the
+-- role against user_metadata, which the user can edit, so they MUST be removed
+-- (policies are OR-ed, so leaving them keeps the hole open). See 003.
+DROP POLICY IF EXISTS "Admins can view all requests" ON public.service_requests;
+DROP POLICY IF EXISTS "Admins can update requests" ON public.service_requests;
+DROP POLICY IF EXISTS "Users can view own requests" ON public.service_requests;
+DROP POLICY IF EXISTS "Users can insert own requests" ON public.service_requests;
+
 -- -----------------------------------------------------------------------------
 -- STEP 4: RLS policies
 -- -----------------------------------------------------------------------------

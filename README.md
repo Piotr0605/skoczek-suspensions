@@ -11,6 +11,7 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
+- [Routing and SEO](#routing-and-seo)
 - [Security](#security)
 - [Project Structure](#project-structure)
 - [Requirements](#requirements)
@@ -28,12 +29,13 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 ## Features
 
 ### Public Website
-- **Home page** — service presentation, brand and offer information
-- **Pricing** — detailed service price list (front forks, rear shocks/dampers, additional services) grouped by manufacturer (FOX, Rock Shox, Ohlins, Marzocchi, and others)
-- **Contact** — address, phone, email, quick inquiry form
+- **Home page** (`/`) — service presentation, scope of work, repair process, FAQ, contact details
+- **Pricing** (`/cennik`) — detailed service price list (front forks, rear shocks/dampers, additional services) grouped by manufacturer (FOX, Rock Shox, Ohlins, Marzocchi, and others). Editable by the administrator from the mechanic panel
+- **Contact** (`/kontakt`) — address, phone, email, quick inquiry form (sent via EmailJS)
 - **Terms of Service** and **Privacy Policy (GDPR)**
 - **Google Maps** — service location (requires cookie consent)
 - **Cookie banner** — GDPR compliance when using maps
+- **SEO** — own URL per page, per-page meta tags and canonical links, `robots.txt`, `sitemap.xml`, Open Graph / Twitter cards, JSON-LD structured data (`LocalBusiness`, `Organization`, `BreadcrumbList`, `FAQPage`), custom 404 page
 
 ### Client Area
 - Registration and login (Supabase Auth, minimum 8-character password)
@@ -42,10 +44,21 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 - Email notification to the service center after submitting a request (EmailJS)
 
 ### Mechanic Panel (Administrator)
+Two tabs: **Zlecenia** (orders) and **Cennik** (pricing).
+
+**Orders**
 - Overview of all service requests
 - Filtering: active, new, in progress, ready, history
 - Status and quote updates (PLN)
 - Archiving completed orders
+
+**Pricing editor**
+- Edits the price list shown on the public `/cennik` page (and in the home page summary)
+- Add / rename / remove / reorder brands, models and additional services
+- Separate prices for "service" and "service with seals", price ranges (`250-300`) and variants (`270 / 350`) are allowed
+- Restore the built-in default price list, discard unsaved changes, warning before leaving with unsaved edits
+- Stored in the `site_content` table (`key = 'pricing'`), readable by everyone, writable by admins only (RLS)
+- Until the first save, the site falls back to the built-in list in `src/constants.ts`
 
 ---
 
@@ -55,7 +68,7 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 |-------|------------|
 | Frontend | React 18, TypeScript |
 | Bundler | Vite 5 |
-| Styling | Tailwind CSS (CDN) |
+| Styling | Tailwind CSS 3 (compiled by PostCSS at build time) |
 | Icons | Lucide React |
 | Backend / Auth | Supabase (PostgreSQL + Auth + RLS) |
 | Email | EmailJS |
@@ -66,7 +79,7 @@ A web application for **Oddaj Amora** (Galeria Rowerowa, Białystok), an authori
 
 ## Architecture
 
-The application is a **SPA** (Single Page Application) with view-based navigation (`HOME`, `FORM`, `DASHBOARD`, `ADMIN`, `CONTACT`, `REGULATIONS`, `PRIVACY`).
+The application is a **SPA** (Single Page Application) with URL-based routing built on the History API (`/`, `/cennik`, `/zglos-serwis`, `/kontakt`, `/regulamin`, `/polityka-prywatnosci`, `/panel-klienta`, `/panel-mechanika`). Every link is a real `<a href>`, so pages can be crawled, bookmarked and opened in a new tab.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -79,6 +92,8 @@ The application is a **SPA** (Single Page Application) with view-based navigatio
 │       ├── auth: register, login, logout, me                  │
 │       └── requests: create, getAll, getAllForUser,           │
 │                     updateStatus                             │
+│  PricingService (pricing.ts)                                 │
+│       └── get / save / defaults (site_content: pricing)      │
 │       │                                                      │
 │       ▼                                                      │
 │  config.ts ──► VITE_* variables (Supabase, EmailJS)          │
@@ -87,8 +102,8 @@ The application is a **SPA** (Single Page Application) with view-based navigatio
          │                                    │
          ▼                                    ▼
    Supabase Auth                    service_requests table
-   (app_metadata: role ADMIN)       + Row Level Security (RLS)
-   (user_metadata: name, phone)
+   (app_metadata: role ADMIN)       site_content table
+   (user_metadata: name, phone)     + Row Level Security (RLS)
 ```
 
 Service request flow:
@@ -97,6 +112,31 @@ Service request flow:
 3. The request is saved in Supabase with `user_id` from the active session
 4. An email notification is sent to the service center (EmailJS)
 5. The client tracks status in the dashboard; the mechanic updates the order in the admin panel
+
+---
+
+## Routing and SEO
+
+Because the site is client-side rendered, SEO metadata is handled in two places that share **one** source of truth — `src/seo/routes.json`:
+
+| Layer | File | Role |
+|-------|------|------|
+| Runtime | `src/seo/seo.ts` (`useSeo`) | Updates `<title>`, description, canonical, robots, Open Graph and `BreadcrumbList` JSON-LD on every client-side navigation |
+| Build time | `scripts/generate-seo.mjs` | After `vite build`, writes one static HTML file per route (`dist/cennik.html`, `dist/kontakt.html`, …) with that route's tags baked in, plus `robots.txt`, `sitemap.xml` and `404.html` |
+
+Vercel's `cleanUrls` (see `vercel.json`) serves `dist/cennik.html` at `/cennik`, so crawlers and social-media scrapers that do not execute JavaScript still receive the correct title, description and canonical URL, while visitors continue to browse a single-page app.
+
+**Adding a page:** add an entry to `src/seo/routes.json` (path, view, title, description, `index`, `priority`, `changefreq`), add the matching `view` to the `View` union in `src/seo/seo.ts`, and render it in `App.tsx`. The sitemap, robots rules and static HTML file are generated automatically.
+
+Other SEO/visibility elements:
+
+- `index.html` — base meta tags, favicons, web manifest, geo tags and sitewide JSON-LD (`Organization`, `LocalBusiness` with address, opening hours and service catalog, `WebSite`)
+- `/panel-klienta` and `/panel-mechanika` are `noindex, nofollow` and are listed under `Disallow` in `robots.txt`
+- `public/og-image.png` (1200×630) — preview image for Facebook, LinkedIn, X and messengers
+- `<noscript>` fallback with the key business information for crawlers without JavaScript
+- `VITE_SITE_URL` overrides the canonical domain (defaults to `https://oddajamora.pl`)
+
+After deployment, submit `https://oddajamora.pl/sitemap.xml` in [Google Search Console](https://search.google.com/search-console) and verify the structured data with the [Rich Results Test](https://search.google.com/test/rich-results).
 
 ---
 
@@ -113,8 +153,13 @@ The application uses multi-layer data protection:
 | **Input validation** | Form field length limits, minimum password length |
 | **Environment variables** | API keys in `VITE_*` env vars instead of hardcoded in components |
 | **Generic error messages** | Registration does not expose server error details |
+| **Security headers** | `vercel.json` sets CSP, HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and `Permissions-Policy` |
+| **Content validation** | Price list loaded from the database is normalized and length-limited before rendering |
 
-SQL migration with RLS policies: `supabase/migrations/001_security_rls.sql`
+SQL migrations with RLS policies:
+- `supabase/migrations/001_security_rls.sql` — ADMIN role + `service_requests`
+- `supabase/migrations/002_site_content_pricing.sql` — `site_content` (editable pricing)
+- `supabase/migrations/003_drop_legacy_policies.sql` — **critical:** removes pre-`001` policies that read the role from the user-editable `user_metadata`
 
 Detailed deployment guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
@@ -124,34 +169,56 @@ Detailed deployment guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
 ```
 skoczek-suspensions/
-├── index.html                  # HTML entry point, Tailwind config
+├── index.html                  # HTML entry point, base meta tags, JSON-LD
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
+├── tailwind.config.js          # Tailwind theme (brand colors, animations)
+├── postcss.config.js
+├── vercel.json                 # Clean URLs, redirects, cache and security headers
 ├── .env.example                # Environment variables template
 ├── .gitignore
 ├── DEPLOY_SECURITY.md          # Security deployment guide
+├── scripts/
+│   └── generate-seo.mjs        # Post-build: per-route HTML, sitemap.xml, robots.txt
+├── public/                     # Served as-is (favicons, manifest, OG image)
+│   ├── favicon.svg
+│   ├── favicon-32.png
+│   ├── apple-touch-icon.png
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   ├── og-image.png
+│   └── site.webmanifest
 ├── supabase/
 │   └── migrations/
-│       └── 001_security_rls.sql  # RLS + ADMIN role migration
+│       ├── 001_security_rls.sql        # RLS + ADMIN role migration
+│       └── 002_site_content_pricing.sql # site_content table (editable pricing)
 └── src/
     ├── index.tsx               # React app mount
     ├── vite-env.d.ts           # VITE_* variable types
     ├── config.ts               # Supabase and EmailJS configuration
-    ├── App.tsx                 # Main component, navigation, layout
+    ├── App.tsx                 # Main component, routing, layout, page content
     ├── types.ts                # TypeScript types (User, ServiceRequest, enums)
-    ├── constants.ts            # Contact info, pricing, terms, privacy policy
+    ├── constants.ts            # Contact info, default pricing, terms, privacy policy
+    ├── styles/
+    │   └── index.css           # Tailwind entry point + base styles
+    ├── seo/
+    │   ├── routes.json         # Single source of truth: routes + meta tags
+    │   └── seo.ts              # Route lookup + useSeo() hook
     ├── utils/
     │   ├── auth.ts             # Role lookup from app_metadata
     │   └── validation.ts       # Form and password validation
     ├── components/
     │   ├── ServiceForm.tsx     # Service request form
     │   ├── Dashboard.tsx       # Client dashboard
-    │   ├── AdminDashboard.tsx  # Mechanic/admin dashboard
+    │   ├── AdminDashboard.tsx  # Mechanic/admin dashboard (orders + pricing tabs)
+    │   ├── PricingTables.tsx   # Public price list rendering
+    │   ├── PricingEditor.tsx   # Admin price list editor
     │   └── CookieBanner.tsx    # Cookie consent banner
     └── services/
         ├── supabaseClient.ts   # Supabase client
-        └── api.ts              # API layer (auth + requests)
+        ├── api.ts              # API layer (auth + requests)
+        └── pricing.ts          # Price list read/write + validation
 ```
 
 ---
@@ -207,10 +274,11 @@ Configuration is done via environment variables with the `VITE_` prefix (`.env.l
 | `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID |
 | `VITE_EMAILJS_TEMPLATE_ID` | Email template ID |
 | `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key |
+| `VITE_SITE_URL` | Canonical site address used in meta tags and `sitemap.xml` (default: `https://oddajamora.pl`) |
 
 Values are loaded in `src/config.ts`. If environment variables are missing, fallbacks are used — this preserves compatibility with the existing deployment, but **setting env vars on Vercel is recommended**.
 
-The EmailJS template should include these fields: `from_name`, `from_email`, `from_phone`, `component_model`, `problem_description`, `delivery_method`, `preferred_date`.
+The EmailJS template should include these fields: `from_name`, `from_email`, `from_phone`, `component_model`, `problem_description`, `delivery_method`, `preferred_date`. The same template is reused by the contact form on `/kontakt` — the subject arrives in `component_model` and the message in `problem_description`, with `-` in the unused fields.
 
 ### Administrator Role
 
@@ -238,9 +306,11 @@ The application is hosted on **Vercel** and builds automatically on `git push` t
 ### Deployment Order (Important)
 
 1. **Supabase** — run `supabase/migrations/001_security_rls.sql` in the SQL Editor
-2. **Verify** — the admin account has `"role": "ADMIN"` in App Metadata
-3. **Vercel** — set `VITE_*` variables (optional but recommended)
-4. **Deploy** — `git push origin main`
+1b. **Supabase** — run `supabase/migrations/003_drop_legacy_policies.sql` (critical security fix; policies are OR-ed, so the old `user_metadata` policies keep the hole open until dropped)
+2. **Supabase** — run `supabase/migrations/002_site_content_pricing.sql` (required for the pricing editor; without it the site keeps showing the built-in price list and saving fails with a clear error)
+3. **Verify** — the admin account has `"role": "ADMIN"` in App Metadata
+4. **Vercel** — set `VITE_*` variables (optional but recommended)
+5. **Deploy** — `git push origin main`
 
 Full step-by-step guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 
@@ -251,7 +321,12 @@ Full step-by-step guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 - [ ] Service request submission
 - [ ] Client dashboard shows only own requests
 - [ ] Mechanic panel — full list and status editing
+- [ ] Mechanic panel → Cennik — edit and save, change visible on `/cennik`
 - [ ] Regular clients cannot access the mechanic panel
+- [ ] `https://oddajamora.pl/robots.txt` and `/sitemap.xml` return 200
+- [ ] `/cennik` opened directly (not via in-app navigation) returns its own title and description
+- [ ] A non-existent address returns the 404 page
+- [ ] Sitemap submitted in Google Search Console
 
 ---
 
@@ -273,6 +348,17 @@ Full step-by-step guide: [`DEPLOY_SECURITY.md`](DEPLOY_SECURITY.md)
 | `estimated_cost` | numeric | Estimated quote (PLN) |
 | `created_at` | timestamptz | Creation timestamp |
 
+### `site_content` Table
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `key` | text | Primary key — content identifier (`pricing`) |
+| `value` | jsonb | Content (price list as an array of categories) |
+| `updated_at` | timestamptz | Last modification (set by trigger) |
+| `updated_by` | uuid | Administrator who saved it (FK to auth.users) |
+
+Readable by everyone (including logged-out visitors), writable only by administrators.
+
 ### Row Level Security (RLS)
 
 After running the `001_security_rls.sql` migration, these policies apply:
@@ -284,6 +370,8 @@ After running the `001_security_rls.sql` migration, these policies apply:
 | INSERT (own request) | Yes | Yes |
 | UPDATE status / quote | No | Yes |
 | DELETE | No | Yes |
+
+For `site_content`: SELECT is allowed for `anon` and `authenticated` (the price list is public), while INSERT/UPDATE/DELETE require `public.is_admin()`.
 
 The `is_admin()` function checks the role exclusively in the JWT `app_metadata`.
 
@@ -316,8 +404,10 @@ The `is_admin()` function checks the role exclusively in the JWT `app_metadata`.
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Vite development server |
-| `npm run build` | Build to `dist/` |
+| `npm run build` | Build to `dist/` + generate per-route HTML, `sitemap.xml` and `robots.txt` |
 | `npm run preview` | Local preview of the production build |
+| `npm run typecheck` | TypeScript check without emitting files |
+| `npm run seo` | Re-run only the SEO generation step on an existing `dist/` |
 
 ---
 

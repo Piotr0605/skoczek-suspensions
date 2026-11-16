@@ -123,12 +123,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
   return (
     <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-xl relative">
       <div className="border-b border-gray-100 pb-6 mb-6">
-        <h2 className="text-2xl font-black text-black flex items-center gap-3 uppercase tracking-tight">
+        <h1 className="text-2xl font-black text-black flex items-center gap-3 uppercase tracking-tight">
             <div className="bg-skoczek-primary text-white p-2 rounded">
                 <Truck className="w-5 h-5" />
             </div>
             Formularz Zgłoszeniowy
-        </h2>
+        </h1>
         <p className="text-gray-500 mt-2 ml-12 text-sm">Wypełnij szczegóły dotyczące sprzętu i usterki.</p>
       </div>
 

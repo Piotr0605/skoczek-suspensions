@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ServiceRequest, ServiceStatus } from '../types';
 import { ApiService } from '../services/api';
-import { RefreshCw, Save, Filter, Phone, Archive } from 'lucide-react';
+import PricingEditor from './PricingEditor';
+import { RefreshCw, Save, Filter, Phone, Archive, ClipboardList, Tag } from 'lucide-react';
+
+type AdminTab = 'REQUESTS' | 'PRICING';
 
 const AdminDashboard: React.FC = () => {
+  const [tab, setTab] = useState<AdminTab>('REQUESTS');
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<ServiceStatus | 'ALL' | 'HISTORY'>('ALL');
@@ -52,10 +56,13 @@ const AdminDashboard: React.FC = () => {
     const edit = edits[id];
     if (!edit) return;
 
+    const parsedCost = edit.cost.trim() === '' ? undefined : Number.parseFloat(edit.cost);
+    const cost = parsedCost !== undefined && Number.isFinite(parsedCost) ? parsedCost : undefined;
+
     try {
-        await ApiService.requests.updateStatus(id, edit.status, parseFloat(edit.cost) || 0);
+        await ApiService.requests.updateStatus(id, edit.status, cost);
         // Refresh local data to match
-        setRequests(prev => prev.map(r => r.id === id ? { ...r, status: edit.status, estimatedCost: parseFloat(edit.cost) || 0 } : r));
+        setRequests(prev => prev.map(r => r.id === id ? { ...r, status: edit.status, estimatedCost: cost ?? r.estimatedCost } : r));
         
         // Remove from edits
         const newEdits = { ...edits };
@@ -95,20 +102,54 @@ const AdminDashboard: React.FC = () => {
         <div>
            <div className="flex items-center gap-2 mb-1">
              <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded uppercase">Admin</span>
-             <h2 className="text-3xl font-black text-black tracking-tight uppercase">Panel Mechanika</h2>
+             <h1 className="text-3xl font-black text-black tracking-tight uppercase">Panel Mechanika</h1>
            </div>
-           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi.</p>
+           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi i cennikiem strony.</p>
         </div>
-        <div className="flex gap-2">
-            <button 
-            onClick={fetchRequests} 
-            className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded text-sm font-bold uppercase hover:border-skoczek-primary hover:text-skoczek-primary transition"
-            >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież
-            </button>
-        </div>
+        {tab === 'REQUESTS' && (
+          <div className="flex gap-2">
+              <button
+              onClick={fetchRequests}
+              className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded text-sm font-bold uppercase hover:border-skoczek-primary hover:text-skoczek-primary transition"
+              >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież
+              </button>
+          </div>
+        )}
       </div>
 
+      {/* Main sections */}
+      <div className="flex gap-2 border-b border-gray-200 pb-px" role="tablist" aria-label="Sekcje panelu">
+         <button
+           role="tab"
+           aria-selected={tab === 'REQUESTS'}
+           onClick={() => setTab('REQUESTS')}
+           className={`flex items-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-t transition border-b-2 ${
+             tab === 'REQUESTS'
+               ? 'border-skoczek-primary text-skoczek-primary bg-white'
+               : 'border-transparent text-gray-500 hover:text-black'
+           }`}
+         >
+           <ClipboardList className="w-4 h-4" /> Zlecenia
+         </button>
+         <button
+           role="tab"
+           aria-selected={tab === 'PRICING'}
+           onClick={() => setTab('PRICING')}
+           className={`flex items-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-t transition border-b-2 ${
+             tab === 'PRICING'
+               ? 'border-skoczek-primary text-skoczek-primary bg-white'
+               : 'border-transparent text-gray-500 hover:text-black'
+           }`}
+         >
+           <Tag className="w-4 h-4" /> Cennik
+         </button>
+      </div>
+
+      {tab === 'PRICING' && <PricingEditor />}
+
+      {tab === 'REQUESTS' && (
+      <>
       {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
          <Filter className="w-4 h-4 text-gray-500 mr-2" />
@@ -227,6 +268,8 @@ const AdminDashboard: React.FC = () => {
             <div className="p-12 text-center text-gray-500">Brak zgłoszeń w tej kategorii.</div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

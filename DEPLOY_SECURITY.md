@@ -33,6 +33,39 @@ SET raw_app_meta_data =
 WHERE email = 'YOUR-ADMIN-EMAIL@example.com';
 ```
 
+### 2a. CRITICAL — Remove Legacy RLS Policies
+
+Run `supabase/migrations/003_drop_legacy_policies.sql` in the SQL Editor.
+
+The database still contains policies created before `001`, under different names:
+`"Admins can view all requests"` and `"Admins can update requests"`. Both read the role from
+`auth.jwt() -> user_metadata -> role`, which **the user can set themselves**
+(`supabase.auth.updateUser({ data: { role: 'ADMIN' } })`). PostgreSQL combines RLS policies with
+`OR`, so as long as they exist, any logged-in client can read and modify **every** service request
+(other customers' names, phone numbers and descriptions).
+
+The secure equivalents based on `public.is_admin()` (app_metadata) already exist, so dropping them
+does not affect real administrators. Verify afterwards:
+
+```sql
+SELECT policyname, cmd, roles::text, qual
+FROM pg_policies
+WHERE schemaname = 'public' AND tablename = 'service_requests'
+ORDER BY cmd, policyname;
+```
+
+No remaining `qual` may contain `user_metadata`.
+
+### 2b. Editable Pricing Migration
+
+Run `supabase/migrations/002_site_content_pricing.sql` the same way (SQL Editor → New query → paste → Run).
+
+This creates the `site_content` table used by **Panel Mechanika → Cennik**:
+- `SELECT` allowed for everyone (the price list is public content),
+- `INSERT` / `UPDATE` / `DELETE` only for admins (`public.is_admin()`).
+
+Without this migration the site still shows the built-in price list from `src/constants.ts`, and the editor reports a clear error instead of saving.
+
 ### 3. Deploy Frontend (Vercel)
 
 ```bash
@@ -65,6 +98,9 @@ Without these variables the app uses fallbacks — it works as before.
 - [ ] Client dashboard — only own requests visible
 - [ ] Mechanic panel — full list and status editing
 - [ ] Regular client **cannot** see the mechanic panel
+- [ ] Mechanic panel → **Cennik**: edit a price, save, confirm the change on `/cennik`
+- [ ] `/robots.txt` and `/sitemap.xml` return 200
+- [ ] Direct entry to `/cennik`, `/kontakt`, `/regulamin` works (no 404)
 
 ## What Was Fixed
 
