@@ -64,6 +64,16 @@
       "changefreq": "yearly"
     },
     {
+      "path": "/ustaw-haslo",
+      "view": "SET_PASSWORD",
+      "label": "Ustaw nowe hasło",
+      "title": "Ustaw nowe hasło | Oddaj Amora",
+      "description": "Ustawienie nowego hasła do konta w serwisie Oddaj Amora.",
+      "index": false,
+      "priority": 0.1,
+      "changefreq": "never"
+    },
+    {
       "path": "/panel-klienta",
       "view": "DASHBOARD",
       "label": "Moje konto",

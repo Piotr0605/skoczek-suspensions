@@ -10,6 +10,7 @@ export type View =
   | 'PRIVACY'
   | 'DASHBOARD'
   | 'ADMIN'
+  | 'SET_PASSWORD'
   | 'NOT_FOUND';
 
 export interface RouteMeta {

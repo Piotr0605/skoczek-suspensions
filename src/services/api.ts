@@ -83,6 +83,85 @@ export const ApiService = {
       if (!session?.user) return null;
       return mapAuthUser(session.user);
     },
+
+    /**
+     * Sends a password recovery e-mail. The link points at /ustaw-haslo, where
+     * supabase-js turns the token in the URL into a short-lived session.
+     *
+     * Errors are deliberately swallowed: reporting "no such account" would let
+     * anyone check which e-mail addresses are registered, so the UI always
+     * shows the same neutral confirmation.
+     */
+    requestPasswordReset: async (email: string): Promise<void> => {
+      const redirectTo =
+        typeof window === 'undefined' ? undefined : `${window.location.origin}/ustaw-haslo`;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
+      if (error) {
+        console.error('Password reset request failed:', error.message);
+      }
+    },
+
+    /**
+     * After the user opens a recovery link, supabase-js needs a moment to turn
+     * the token in the URL into a session. Resolves true once a session exists,
+     * false when the link was already used, expired or malformed.
+     */
+    waitForSession: (timeoutMs = 3000): Promise<boolean> =>
+      new Promise((resolve) => {
+        let settled = false;
+        let unsubscribe: (() => void) | null = null;
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
+        const finish = (value: boolean) => {
+          if (settled) return;
+          settled = true;
+          if (timer) clearTimeout(timer);
+          if (unsubscribe) unsubscribe();
+          resolve(value);
+        };
+
+        timer = setTimeout(() => finish(false), timeoutMs);
+
+        const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+          if (session) finish(true);
+        });
+        unsubscribe = () => data.subscription.unsubscribe();
+
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session) finish(true);
+        });
+      }),
+
+    /** Sets a new password for the currently signed-in (or recovery) session. */
+    setPassword: async (newPassword: string): Promise<void> => {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        throw new Error(error.message || 'Nie udało się zapisać nowego hasła.');
+      }
+    },
+
+    /**
+     * Password change for a signed-in user. supabase.auth.updateUser() does NOT
+     * verify the current password, so it is re-checked with signInWithPassword
+     * first — otherwise anyone with access to an unlocked browser could take
+     * over the account.
+     */
+    changePassword: async (
+      email: string,
+      currentPassword: string,
+      newPassword: string,
+    ): Promise<void> => {
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword,
+      });
+      if (verifyError) {
+        throw new Error('Obecne hasło jest nieprawidłowe.');
+      }
+
+      await ApiService.auth.setPassword(newPassword);
+    },
   },
 
   requests: {

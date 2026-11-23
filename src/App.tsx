@@ -11,12 +11,14 @@ import Dashboard from './components/Dashboard';
 import AdminDashboard from './components/AdminDashboard';
 import CookieBanner from './components/CookieBanner';
 import PricingTables from './components/PricingTables';
+import SetPasswordForm from './components/SetPasswordForm';
+import ChangePasswordModal from './components/ChangePasswordModal';
 import { useSeo, routeForPath, normalizePath, SITE_URL } from './seo/seo';
 import { validatePassword, validateRegistration } from './utils/validation';
 import {
   Menu, X, MapPin, Phone, Mail, ChevronRight,
   ShieldCheck, User as UserIcon, LogOut,
-  CheckCircle, Send, Cookie, Wrench, Package, Truck, Clock, AlertCircle,
+  CheckCircle, Send, Cookie, Wrench, Package, Truck, Clock, AlertCircle, KeyRound,
 } from 'lucide-react';
 
 const SuspensionLogo: React.FC<{ className?: string }> = ({ className }) => (
@@ -213,11 +215,24 @@ interface AuthModalProps {
   onLoginSuccess: (user: User) => void;
 }
 
+type AuthMode = 'login' | 'register' | 'reset';
+
 const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<AuthMode>('login');
   const [formData, setFormData] = useState({ email: '', password: '', name: '', phone: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+
+  const isLogin = mode === 'login';
+  const isRegister = mode === 'register';
+  const isReset = mode === 'reset';
+
+  const switchMode = (next: AuthMode) => {
+    setMode(next);
+    setError('');
+    setResetSent(false);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -232,13 +247,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
     setError('');
     setLoading(true);
     try {
+      // Password recovery: always report the same thing, whether or not the
+      // address exists, so the form cannot be used to probe for accounts.
+      if (isReset) {
+        await ApiService.auth.requestPasswordReset(formData.email);
+        setResetSent(true);
+        return;
+      }
+
       const passwordError = validatePassword(formData.password);
       if (passwordError) {
         setError(passwordError);
         return;
       }
 
-      if (!isLogin) {
+      if (isRegister) {
         const registrationError = validateRegistration(formData.name, formData.phone);
         if (registrationError) {
           setError(registrationError);
@@ -275,11 +298,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
       <div className="bg-white w-full max-w-md rounded-lg shadow-2xl overflow-hidden relative border border-gray-200">
         <button onClick={onClose} aria-label="Zamknij okno logowania" className="absolute top-4 right-4 text-gray-400 hover:text-black"><X /></button>
         <div className="p-8">
-          <h2 id="auth-modal-title" className="text-2xl font-bold text-skoczek-primary mb-2">{isLogin ? 'Zaloguj się' : 'Utwórz konto'}</h2>
-          <p className="text-gray-500 text-sm mb-6">Zarządzaj swoimi naprawami w bazie danych Oddaj Amora.</p>
+          <h2 id="auth-modal-title" className="text-2xl font-bold text-skoczek-primary mb-2">
+            {isReset ? 'Nie pamiętasz hasła?' : isLogin ? 'Zaloguj się' : 'Utwórz konto'}
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">
+            {isReset
+              ? 'Podaj adres e-mail konta. Wyślemy na niego link do ustawienia nowego hasła.'
+              : 'Zarządzaj swoimi naprawami w bazie danych Oddaj Amora.'}
+          </p>
 
+          {resetSent ? (
+            <div className="space-y-6">
+              <div className="bg-green-50 border border-green-100 p-4 rounded flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 mt-0.5 shrink-0 text-green-600" aria-hidden="true" />
+                <div>
+                  <p className="font-bold text-green-800">Sprawdź skrzynkę</p>
+                  <p className="text-sm text-green-700 mt-1">
+                    Jeśli konto o tym adresie istnieje, wysłaliśmy na nie link do ustawienia nowego
+                    hasła. Zajrzyj też do folderu ze spamem - link jest jednorazowy.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => switchMode('login')}
+                className="w-full bg-skoczek-primary text-white font-bold py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wide"
+              >
+                Wróć do logowania
+              </button>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {isRegister && (
               <>
                 <label className="sr-only" htmlFor="auth-name">Imię i nazwisko</label>
                 <input id="auth-name" required autoComplete="name" placeholder="Imię i Nazwisko" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
@@ -292,23 +341,46 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
             <label className="sr-only" htmlFor="auth-email">Adres e-mail</label>
             <input id="auth-email" required type="email" autoComplete="email" placeholder="Email" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
               value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-            <label className="sr-only" htmlFor="auth-password">Hasło</label>
-            <input id="auth-password" required type="password" autoComplete={isLogin ? 'current-password' : 'new-password'} placeholder="Hasło (min. 8 znaków)" minLength={8} className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
-              value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+            {!isReset && (
+              <>
+                <label className="sr-only" htmlFor="auth-password">Hasło</label>
+                <input id="auth-password" required type="password" autoComplete={isLogin ? 'current-password' : 'new-password'} placeholder="Hasło (min. 8 znaków)" minLength={8} className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
+                  value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+              </>
+            )}
+
+            {isLogin && (
+              <div className="text-right">
+                <button type="button" onClick={() => switchMode('reset')} className="text-xs font-bold text-gray-500 hover:text-skoczek-primary transition uppercase tracking-wide">
+                  Nie pamiętasz hasła?
+                </button>
+              </div>
+            )}
 
             {error && <p role="alert" className="text-red-600 text-sm font-medium bg-red-50 p-2 rounded">{error}</p>}
 
             <button disabled={loading} type="submit" className="w-full bg-skoczek-primary text-white font-bold py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wide disabled:opacity-50 flex justify-center">
-              {loading ? <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> : (isLogin ? 'Zaloguj' : 'Zarejestruj')}
+              {loading ? <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> : isReset ? 'Wyślij link' : isLogin ? 'Zaloguj' : 'Zarejestruj'}
             </button>
           </form>
+          )}
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            {isLogin ? 'Nie masz konta? ' : 'Masz już konto? '}
-            <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-skoczek-primary font-semibold hover:text-skoczek-primaryHover transition">
-              {isLogin ? 'Zarejestruj się' : 'Zaloguj się'}
-            </button>
-          </div>
+          {!resetSent && (
+            <div className="mt-6 text-center text-sm text-gray-500">
+              {isReset ? (
+                <button onClick={() => switchMode('login')} className="text-skoczek-primary font-semibold hover:text-skoczek-primaryHover transition">
+                  Wróć do logowania
+                </button>
+              ) : (
+                <>
+                  {isLogin ? 'Nie masz konta? ' : 'Masz już konto? '}
+                  <button onClick={() => switchMode(isLogin ? 'register' : 'login')} className="text-skoczek-primary font-semibold hover:text-skoczek-primaryHover transition">
+                    {isLogin ? 'Zarejestruj się' : 'Zaloguj się'}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -442,6 +514,7 @@ const App: React.FC = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [appLoading, setAppLoading] = useState(true);
   const [cookieConsent, setCookieConsent] = useState(false);
@@ -595,7 +668,8 @@ const App: React.FC = () => {
                     </span>
                     <span className="block text-sm font-bold text-black">{user.name}</span>
                   </div>
-                  <button onClick={handleLogout} aria-label="Wyloguj się" className="text-gray-400 hover:text-skoczek-primary"><LogOut className="w-5 h-5" /></button>
+                  <button onClick={() => setIsChangePasswordOpen(true)} aria-label="Zmień hasło" title="Zmień hasło" className="text-gray-400 hover:text-skoczek-primary"><KeyRound className="w-5 h-5" /></button>
+                  <button onClick={handleLogout} aria-label="Wyloguj się" title="Wyloguj się" className="text-gray-400 hover:text-skoczek-primary"><LogOut className="w-5 h-5" /></button>
                 </div>
               ) : (
                 <button
@@ -633,7 +707,10 @@ const App: React.FC = () => {
 
                 <hr className="border-gray-100" />
                 {user ? (
-                  <button onClick={handleLogout} className="text-red-500 font-bold uppercase py-2">Wyloguj się</button>
+                  <>
+                    <button onClick={() => { setIsChangePasswordOpen(true); setMobileMenuOpen(false); }} className="text-gray-700 font-bold uppercase py-2 text-sm tracking-wider">Zmień hasło</button>
+                    <button onClick={handleLogout} className="text-red-500 font-bold uppercase py-2">Wyloguj się</button>
+                  </>
                 ) : (
                   <button onClick={() => { setIsAuthModalOpen(true); setMobileMenuOpen(false); }} className="bg-skoczek-primary text-white py-3 font-bold uppercase rounded">Zaloguj się</button>
                 )}
@@ -1015,6 +1092,17 @@ const App: React.FC = () => {
           </div>
         )}
 
+        {view === 'SET_PASSWORD' && (
+          <div className="bg-gray-50 py-16 min-h-[calc(100vh-theme(spacing.24))]">
+            <div className="max-w-xl mx-auto px-4">
+              <SetPasswordForm
+                onDone={(updatedUser) => setUser(updatedUser)}
+                onNavigate={(to) => navigate(to)}
+              />
+            </div>
+          </div>
+        )}
+
         {view === 'NOT_FOUND' && (
           <div className="bg-gray-50 py-24 min-h-[calc(100vh-theme(spacing.24))]">
             <div className="max-w-2xl mx-auto px-4 text-center">
@@ -1081,6 +1169,9 @@ const App: React.FC = () => {
 
       <CookieBanner onAccept={handleAcceptCookies} />
       {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} onLoginSuccess={(u) => { setUser(u); setIsAuthModalOpen(false); }} />}
+      {isChangePasswordOpen && user && (
+        <ChangePasswordModal user={user} onClose={() => setIsChangePasswordOpen(false)} />
+      )}
       <Analytics />
     </div>
     </RouterContext.Provider>
