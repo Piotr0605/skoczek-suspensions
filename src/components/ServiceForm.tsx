@@ -121,25 +121,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-xl relative">
-      <div className="border-b border-gray-100 pb-6 mb-6">
-        <h1 className="text-2xl font-black text-black flex items-center gap-3 uppercase tracking-tight">
-            <div className="bg-skoczek-primary text-white p-2 rounded">
-                <Truck className="w-5 h-5" />
-            </div>
-            Formularz Zgłoszeniowy
-        </h1>
-        <p className="text-gray-500 mt-2 ml-12 text-sm">Wypełnij szczegóły dotyczące sprzętu i usterki.</p>
+    <div className="panel p-8 relative">
+      <div className="border-b border-line pb-7 mb-8">
+        <p className="eyebrow mb-3">Zgłoszenie serwisowe</p>
+        <h1 className="text-[28px] font-bold text-ink-900 tracking-tighter">Formularz zgłoszeniowy</h1>
+        <p className="text-ink-500 mt-2 text-[15px]">Wypełnij szczegóły dotyczące sprzętu i usterki.</p>
       </div>
 
       {!user && (
-        <div className="mb-8 bg-orange-50 border border-skoczek-primary/20 text-orange-800 p-4 rounded-lg flex items-start gap-3">
+        <div className="mb-8 bg-skoczek-light border-l-2 border-skoczek-primary p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-skoczek-primary" />
           <div>
-            <p className="font-bold text-gray-900">Wymagane logowanie</p>
-            <p className="text-sm mt-1 text-gray-600">
+            <p className="font-semibold text-ink-900">Wymagane logowanie</p>
+            <p className="text-[14px] mt-1 text-ink-600">
               Aby wysłać zgłoszenie serwisowe, musisz posiadać konto. 
-              <button onClick={onRequestLogin} className="text-skoczek-primary font-bold underline ml-1 hover:text-skoczek-primaryHover transition">Zaloguj się lub zarejestruj</button>.
+              <button onClick={onRequestLogin} className="link-accent font-medium ml-1">Zaloguj się lub zarejestruj</button>.
             </p>
           </div>
         </div>
@@ -148,21 +144,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
       <form onSubmit={handleSubmit} className="space-y-6">
         {user && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                <label className="text-xs text-gray-400 font-bold uppercase block mb-1">Klient</label>
-                <div className="flex items-center gap-2 text-gray-900 font-bold">
-                  <UserIcon className="w-4 h-4 text-gray-400" /> {user.name}
+             <div className="border border-line p-4">
+                <span className="eyebrow-muted block mb-2">Klient</span>
+                <div className="flex items-center gap-2 text-ink-900 font-medium">
+                  <UserIcon className="w-4 h-4 text-ink-400" /> {user.name}
                 </div>
              </div>
-             <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                <label className="text-xs text-gray-400 font-bold uppercase block mb-1">Kontakt</label>
-                <div className="text-gray-900 font-bold">{user.phone}</div>
+             <div className="border border-line p-4">
+                <span className="eyebrow-muted block mb-2">Kontakt</span>
+                <div className="text-ink-900 font-medium">{user.phone}</div>
              </div>
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Model Amortyzatora / Dampera</label>
+          <label className="field-label">Model Amortyzatora / Dampera</label>
           <input
             type="text"
             name="componentModel"
@@ -170,12 +166,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
             onChange={handleChange}
             required
             placeholder="np. RockShox Pike Ultimate 2023"
-            className="w-full bg-white border border-gray-300 rounded p-4 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition placeholder-gray-400"
+            className="field"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Opis Problemu</label>
+          <label className="field-label">Opis Problemu</label>
           <textarea
             name="problemDescription"
             value={formData.problemDescription}
@@ -183,13 +179,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
             required
             rows={4}
             placeholder="Opisz usterkę lub wymagane czynności serwisowe..."
-            className="w-full bg-white border border-gray-300 rounded p-4 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition placeholder-gray-400"
+            className="field"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Sposób Dostarczenia</label>
+             <label className="field-label">Sposób Dostarczenia</label>
              <div className="flex gap-4">
                <label className="flex items-center gap-2 cursor-pointer group p-3 border rounded w-full transition bg-gray-50 hover:bg-white hover:border-gray-300 has-[:checked]:border-skoczek-primary has-[:checked]:bg-orange-50 has-[:checked]:text-skoczek-primary">
                  <input 
@@ -200,7 +196,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
                     onChange={handleChange}
                     className="hidden"
                  />
-                 <div className="text-sm font-bold">Osobiście</div>
+                 <div className="text-[14px] font-medium">Osobiście</div>
                  {formData.deliveryMethod === DeliveryMethod.PERSONAL && <Check className="w-4 h-4 ml-auto" />}
                </label>
                
@@ -213,36 +209,36 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
                     onChange={handleChange}
                     className="hidden"
                  />
-                 <div className="text-sm font-bold">Wysyłka</div>
+                 <div className="text-[14px] font-medium">Wysyłka</div>
                  {formData.deliveryMethod === DeliveryMethod.SHIPPING && <Check className="w-4 h-4 ml-auto" />}
                </label>
              </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Preferowany Termin</label>
+            <label className="field-label">Preferowany Termin</label>
             <div className="relative">
-              <Calendar className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+              <Calendar className="absolute left-3 top-3.5 w-5 h-5 text-ink-400 pointer-events-none" />
               <input
                 type="date"
                 name="preferredDate"
                 value={formData.preferredDate}
                 onChange={handleChange}
-                className="w-full bg-white border border-gray-300 rounded p-3 pl-12 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
+                className="field pl-11"
               />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 p-5 rounded border border-gray-200 text-sm">
-          <h4 className="text-black font-bold uppercase text-xs mb-3">Regulamin Serwisu i Polityka Prywatności</h4>
-          <div className="mb-4 h-32 overflow-y-auto custom-scrollbar text-gray-600 pr-2 border border-gray-200 bg-white p-3 rounded text-xs whitespace-pre-wrap">
+        <div className="border border-line p-5 text-sm bg-ink-50">
+          <h2 className="eyebrow-muted mb-3">Regulamin i polityka prywatności</h2>
+          <div className="mb-4 h-32 overflow-y-auto custom-scrollbar text-ink-600 pr-2 border border-line bg-white p-3 text-[12px] leading-relaxed whitespace-pre-wrap">
             {FULL_REGULATIONS}
           </div>
           
           <div className="space-y-3">
               <label className="flex items-start gap-3 cursor-pointer group select-none">
-                 <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptTerms ? 'border-skoczek-primary bg-skoczek-primary' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
+                 <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptTerms ? 'border-skoczek-primary bg-skoczek-primary' : 'border-line-strong bg-white group-hover:border-ink-400'}`}>
                     {formData.acceptTerms && <Check className="w-3 h-3 text-white" />}
                  </div>
                 <input 
@@ -258,7 +254,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
               </label>
 
               <label className="flex items-start gap-3 cursor-pointer group select-none">
-                 <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptPrivacy ? 'border-skoczek-primary bg-skoczek-primary' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
+                 <div className={`mt-0.5 w-5 h-5 border rounded flex items-center justify-center shrink-0 transition ${formData.acceptPrivacy ? 'border-skoczek-primary bg-skoczek-primary' : 'border-line-strong bg-white group-hover:border-ink-400'}`}>
                     {formData.acceptPrivacy && <Check className="w-3 h-3 text-white" />}
                  </div>
                 <input 
@@ -276,7 +272,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm font-bold flex items-center gap-2 bg-red-50 p-3 rounded border border-red-100">
+          <div className="text-red-700 text-sm font-medium flex items-center gap-2 bg-red-50 p-3 border-l-2 border-red-500">
             <AlertCircle className="w-4 h-4" /> {error}
           </div>
         )}
@@ -284,13 +280,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ user, onSuccess, onRequestLog
         <button
           type="submit"
           disabled={isSubmitting || !user}
-          className={`w-full py-4 rounded font-black text-lg uppercase tracking-wider flex justify-center items-center gap-2 transition-all shadow-lg
+          className={`w-full py-4 rounded font-semibold text-lg uppercase tracking-wider flex justify-center items-center gap-2 transition-all shadow-lg
             ${isSubmitting || !user
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' 
               : 'bg-skoczek-primary text-white hover:bg-skoczek-primaryHover shadow-skoczek-primary/30'
             }`}
         >
-          {isSubmitting ? 'Przetwarzanie...' : 'Wyślij Zgłoszenie'}
+          {isSubmitting ? 'Przetwarzanie...' : 'Wyślij zgłoszenie'}
           {!isSubmitting && <Check className="w-5 h-5" />}
         </button>
       </form>

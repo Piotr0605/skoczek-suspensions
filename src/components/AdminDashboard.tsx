@@ -101,10 +101,10 @@ const AdminDashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 gap-4">
         <div>
            <div className="flex items-center gap-2 mb-1">
-             <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded uppercase">Admin</span>
-             <h1 className="text-3xl font-black text-black tracking-tight uppercase">Panel Mechanika</h1>
+             <span className="bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded uppercase">Admin</span>
+             <h1 className="text-3xl font-bold text-ink-900 tracking-tighter">Panel mechanika</h1>
            </div>
-           <p className="text-gray-500 text-sm">Zarządzanie zgłoszeniami serwisowymi i cennikiem strony.</p>
+           <p className="text-ink-500 text-[15px] mt-1">Zarządzanie zgłoszeniami serwisowymi i cennikiem strony.</p>
         </div>
         {tab === 'REQUESTS' && (
           <div className="flex gap-2">
@@ -165,7 +165,7 @@ const AdminDashboard: React.FC = () => {
          </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      <div className="panel overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left min-w-[1000px]">
             <thead className="bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider">
@@ -241,7 +241,7 @@ const AdminDashboard: React.FC = () => {
                        {isEditing && (
                          <button 
                            onClick={() => saveChanges(req.id)}
-                           className="bg-skoczek-primary text-white p-2 rounded hover:bg-skoczek-primaryHover transition shadow-md"
+                           className="bg-skoczek-primary text-white p-2 rounded hover:bg-skoczek-primaryHover transition "
                            title="Zapisz zmiany"
                          >
                            <Save className="w-4 h-4" />

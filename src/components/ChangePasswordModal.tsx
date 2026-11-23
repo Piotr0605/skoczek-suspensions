@@ -10,7 +10,7 @@ interface ChangePasswordModalProps {
 }
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition';
+  'field';
 
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ user, onClose }) => {
   const [current, setCurrent] = useState('');
@@ -67,7 +67,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ user, onClose
       aria-modal="true"
       aria-labelledby="change-password-title"
     >
-      <div className="bg-white w-full max-w-md rounded-lg shadow-2xl overflow-hidden relative border border-gray-200">
+      <div className="bg-white w-full max-w-md border border-line relative">
         <button
           onClick={onClose}
           aria-label="Zamknij okno zmiany hasła"
@@ -79,15 +79,15 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ user, onClose
         <div className="p-8">
           <h2
             id="change-password-title"
-            className="text-2xl font-bold text-skoczek-primary mb-2 flex items-center gap-2"
+            className="text-[22px] font-bold text-ink-900 tracking-tight mb-2 flex items-center gap-2"
           >
-            <KeyRound className="w-5 h-5" aria-hidden="true" /> Zmiana hasła
+            <KeyRound className="w-5 h-5 text-skoczek-primary" aria-hidden="true" /> Zmiana hasła
           </h2>
           <p className="text-gray-500 text-sm mb-6 break-all">{user.email}</p>
 
           {done ? (
             <div className="text-center py-4">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 bg-green-100 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-7 h-7 text-green-600" aria-hidden="true" />
               </div>
               <p className="font-bold text-green-800 mb-2">Hasło zostało zmienione</p>
@@ -104,7 +104,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ user, onClose
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="current-password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                <label htmlFor="current-password" className="field-label">
                   Obecne hasło
                 </label>
                 <input
@@ -119,7 +119,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ user, onClose
               </div>
 
               <div>
-                <label htmlFor="change-new-password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                <label htmlFor="change-new-password" className="field-label">
                   Nowe hasło
                 </label>
                 <input
@@ -136,7 +136,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ user, onClose
               </div>
 
               <div>
-                <label htmlFor="change-confirm-password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                <label htmlFor="change-confirm-password" className="field-label">
                   Powtórz nowe hasło
                 </label>
                 <input

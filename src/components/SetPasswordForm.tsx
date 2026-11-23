@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { User } from '../types';
+import { User, UserRole } from '../types';
 import { ApiService } from '../services/api';
 import { validatePassword } from '../utils/validation';
-import { KeyRound, CheckCircle, AlertCircle, Send } from 'lucide-react';
+import { CheckCircle, AlertCircle, Send } from 'lucide-react';
 
 interface SetPasswordFormProps {
   /** Called after the password was changed, with the refreshed user. */
@@ -13,7 +13,7 @@ interface SetPasswordFormProps {
 type Status = 'checking' | 'ready' | 'expired' | 'saved';
 
 const inputClass =
-  'w-full bg-white border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition';
+  'field';
 
 /** Reads an error handed back by Supabase in the URL hash or query string. */
 function errorFromUrl(): string | null {
@@ -39,6 +39,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
   // Re-send form (shown when the link is no longer valid)
   const [resendEmail, setResendEmail] = useState('');
   const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [panelPath, setPanelPath] = useState('/panel-klienta');
 
   useEffect(() => {
     let active = true;
@@ -79,6 +80,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
       try {
         await ApiService.auth.setPassword(password);
         const user = await ApiService.auth.me();
+        setPanelPath(user?.role === UserRole.ADMIN ? '/panel-mechanika' : '/panel-klienta');
         setStatus('saved');
         setPassword('');
         setConfirm('');
@@ -100,12 +102,10 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
   };
 
   return (
-    <div className="bg-white p-8 md:p-10 rounded-xl border border-gray-200 shadow-xl">
-      <div className="flex items-center gap-3 border-b border-gray-100 pb-6 mb-6">
-        <div className="bg-skoczek-primary text-white p-2 rounded">
-          <KeyRound className="w-5 h-5" aria-hidden="true" />
-        </div>
-        <h1 className="text-2xl font-black text-black uppercase tracking-tight">Ustaw nowe hasło</h1>
+    <div className="panel p-8 md:p-10">
+      <div className="border-b border-line pb-7 mb-8">
+        <p className="eyebrow mb-3">Konto</p>
+        <h1 className="text-[28px] font-bold text-ink-900 tracking-tighter">Ustaw nowe hasło</h1>
       </div>
 
       {status === 'checking' && (
@@ -121,7 +121,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
           </p>
 
           <div>
-            <label htmlFor="new-password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+            <label htmlFor="new-password" className="field-label">
               Nowe hasło
             </label>
             <input
@@ -139,7 +139,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+            <label htmlFor="confirm-password" className="field-label">
               Powtórz nowe hasło
             </label>
             <input
@@ -165,7 +165,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-skoczek-primary text-white font-black py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm disabled:opacity-50"
+            className="w-full bg-skoczek-primary text-white font-semibold py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm disabled:opacity-50"
           >
             {saving ? 'Zapisywanie...' : 'Zapisz nowe hasło'}
           </button>
@@ -174,7 +174,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
 
       {status === 'saved' && (
         <div className="text-center py-6 animate-fade-in">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-green-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-bold text-green-800 mb-2">Hasło zostało zmienione</h2>
@@ -183,14 +183,14 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
-              onClick={() => onNavigate('/panel-klienta')}
-              className="bg-skoczek-primary text-white font-black px-6 py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm"
+              onClick={() => onNavigate(panelPath)}
+              className="bg-skoczek-primary text-white font-semibold px-6 py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm"
             >
               Przejdź do panelu
             </button>
             <button
               onClick={() => onNavigate('/')}
-              className="bg-white text-gray-900 border border-gray-300 font-black px-6 py-3 rounded hover:border-skoczek-primary transition uppercase tracking-wider text-sm"
+              className="bg-white text-gray-900 border border-gray-300 font-semibold px-6 py-3 rounded hover:border-skoczek-primary transition uppercase tracking-wider text-sm"
             >
               Strona główna
             </button>
@@ -203,7 +203,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
           <div className="bg-orange-50 border border-skoczek-primary/20 p-4 rounded flex items-start gap-3">
             <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-skoczek-primary" aria-hidden="true" />
             <div>
-              <p className="font-bold text-gray-900">Link wygasł lub został już użyty</p>
+              <p className="font-semibold text-ink-900">Link wygasł lub został już użyty</p>
               <p className="text-sm text-gray-600 mt-1">
                 {error || 'Linki do zmiany hasła są jednorazowe i ważne przez ograniczony czas.'}
               </p>
@@ -218,7 +218,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ onDone, onNavigate })
           ) : (
             <form onSubmit={handleResend} className="space-y-4">
               <div>
-                <label htmlFor="resend-email" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                <label htmlFor="resend-email" className="field-label">
                   Wyślij nowy link na adres e-mail
                 </label>
                 <input

@@ -32,7 +32,7 @@ const PricingTables: React.FC<PricingTablesProps> = ({ categories, loading }) =>
   return (
     <div>
       <div
-        className="flex gap-2 mb-8 overflow-x-auto w-full pb-2 md:pb-0"
+        className="flex gap-8 mb-10 overflow-x-auto w-full border-b border-line"
         role="tablist"
         aria-label="Kategorie cennika"
       >
@@ -42,10 +42,10 @@ const PricingTables: React.FC<PricingTablesProps> = ({ categories, loading }) =>
             role="tab"
             aria-selected={activeTab === cat.id}
             onClick={() => setActiveTab(cat.id)}
-            className={`px-6 py-3 font-bold uppercase text-sm tracking-wider rounded transition whitespace-nowrap shrink-0 ${
+            className={`relative -mb-px pb-4 text-[14px] font-medium tracking-tight transition-colors whitespace-nowrap shrink-0 border-b-2 ${
               activeTab === cat.id
-                ? 'bg-skoczek-primary text-white shadow-lg shadow-skoczek-primary/20'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'border-skoczek-primary text-ink-900'
+                : 'border-transparent text-ink-400 hover:text-ink-900'
             }`}
           >
             {TAB_LABELS[cat.id] ?? cat.title}
@@ -57,7 +57,7 @@ const PricingTables: React.FC<PricingTablesProps> = ({ categories, loading }) =>
         <h2 className="sr-only">{activeData.title}</h2>
 
         {activeData.services && activeData.services.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm mb-8">
+          <div className="border-t border-line mb-10">
             <table className="w-full text-left">
               <caption className="sr-only">{activeData.title} - cennik</caption>
               <thead className="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -74,7 +74,7 @@ const PricingTables: React.FC<PricingTablesProps> = ({ categories, loading }) =>
                 {activeData.services.map((svc, idx) => (
                   <tr key={`${svc.name}-${idx}`} className="hover:bg-gray-50 transition">
                     <td className="p-5 font-bold text-black">{svc.name}</td>
-                    <td className="p-5 text-right font-black text-skoczek-primary">{svc.price}</td>
+                    <td className="p-5 text-right font-semibold text-skoczek-primary">{svc.price}</td>
                   </tr>
                 ))}
               </tbody>
@@ -83,44 +83,44 @@ const PricingTables: React.FC<PricingTablesProps> = ({ categories, loading }) =>
         )}
 
         {activeData.brands && activeData.brands.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-12">
             {activeData.brands.map((brand) => (
-              <div
-                key={brand.name}
-                className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm"
-              >
-                <div className="bg-gray-50 p-4 border-b border-gray-200 flex items-center gap-2">
-                  <h3 className="font-black text-lg text-black uppercase tracking-tight">
+              <div key={brand.name}>
+                <div className="flex items-baseline gap-4 pb-3 border-b-2 border-ink-900">
+                  <h3 className="text-[17px] font-semibold text-ink-900 tracking-tight">
                     {brand.name}
                   </h3>
+                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400">
+                    {brand.rows.length} {brand.rows.length === 1 ? 'pozycja' : 'pozycji'}
+                  </span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left min-w-[600px]">
                     <caption className="sr-only">
                       {brand.name} - ceny serwisu ({activeData.title})
                     </caption>
-                    <thead className="bg-white text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-                      <tr>
-                        <th scope="col" className="p-4 w-1/2">
+                    <thead>
+                      <tr className="border-b border-line">
+                        <th scope="col" className="py-3 pr-4 w-1/2 font-mono text-[11px] font-normal uppercase tracking-[0.14em] text-ink-400">
                           Model
                         </th>
-                        <th scope="col" className="p-4 text-right">
+                        <th scope="col" className="py-3 px-4 text-right font-mono text-[11px] font-normal uppercase tracking-[0.14em] text-ink-400">
                           Cena serwisu
                         </th>
-                        <th scope="col" className="p-4 text-right">
+                        <th scope="col" className="py-3 pl-4 text-right font-mono text-[11px] font-normal uppercase tracking-[0.14em] text-ink-400">
                           Z uszczelkami
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody>
                       {brand.rows.map((row, idx) => (
-                        <tr key={`${row.model}-${idx}`} className="hover:bg-gray-50 transition">
-                          <td className="p-4 font-medium text-gray-800">{row.model}</td>
-                          <td className="p-4 text-right font-bold text-gray-900">
-                            {row.priceService || <span className="text-gray-300">-</span>}
+                        <tr key={`${row.model}-${idx}`} className="border-b border-line hover:bg-ink-50/60 transition-colors">
+                          <td className="py-3.5 pr-4 text-[15px] text-ink-800">{row.model}</td>
+                          <td className="py-3.5 px-4 text-right font-mono text-[15px] text-ink-900">
+                            {row.priceService || <span className="text-ink-300">&mdash;</span>}
                           </td>
-                          <td className="p-4 text-right font-black text-skoczek-primary">
-                            {row.priceFull || <span className="text-gray-300">-</span>}
+                          <td className="py-3.5 pl-4 text-right font-mono text-[15px] text-skoczek-primary">
+                            {row.priceFull || <span className="text-ink-300">&mdash;</span>}
                           </td>
                         </tr>
                       ))}

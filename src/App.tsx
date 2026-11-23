@@ -93,10 +93,10 @@ const NavLink: React.FC<{ label: string; to: string }> = ({ label, to }) => {
   return (
     <Link
       to={to}
-      className={`text-sm font-bold tracking-wider uppercase transition-colors ${
+      className={`relative py-1 text-[13px] font-medium tracking-tight transition-colors ${
         normalizePath(to) === path
-          ? 'text-skoczek-primary'
-          : 'text-gray-700 hover:text-skoczek-primary'
+          ? 'text-ink-900 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-full after:bg-skoczek-primary'
+          : 'text-ink-500 hover:text-ink-900'
       }`}
     >
       {label}
@@ -138,42 +138,34 @@ const MapComponent: React.FC<{ consent: boolean; onAccept: () => void }> = ({ co
 };
 
 const ContactDetails: React.FC = () => (
-  <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8">
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center shrink-0 text-skoczek-primary">
-        <MapPin className="w-6 h-6" aria-hidden="true" />
-      </div>
+  <div className="panel divide-y divide-line">
+    <div className="flex items-start gap-5 p-6">
+      <MapPin className="w-5 h-5 shrink-0 text-skoczek-primary mt-1" aria-hidden="true" />
       <div>
-        <h2 className="font-bold uppercase text-sm text-gray-400 mb-1">Adres</h2>
-        <p className="font-bold text-lg text-black">{ADDRESS}</p>
-        <p className="text-sm text-gray-500">Łapy, powiat białostocki, woj. podlaskie</p>
+        <h2 className="eyebrow-muted mb-2">Adres</h2>
+        <p className="text-[17px] font-medium text-ink-900">{ADDRESS}</p>
+        <p className="text-[14px] text-ink-500 mt-1">Łapy, powiat białostocki, woj. podlaskie</p>
       </div>
     </div>
 
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center shrink-0 text-skoczek-primary">
-        <Phone className="w-6 h-6" aria-hidden="true" />
-      </div>
+    <div className="flex items-start gap-5 p-6">
+      <Phone className="w-5 h-5 shrink-0 text-skoczek-primary mt-1" aria-hidden="true" />
       <div className="flex-1">
-        <h2 className="font-bold uppercase text-sm text-gray-400 mb-1">Telefon</h2>
-        <p className="font-bold text-2xl text-black mb-2">{PHONE}</p>
-        <p className="text-sm text-gray-500 mb-2">Poniedziałek - piątek, 10:00 - 18:00</p>
-        <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 bg-skoczek-primary text-white px-4 py-2 rounded text-sm font-bold uppercase hover:bg-skoczek-primaryHover transition shadow-lg shadow-skoczek-primary/30">
-          <Phone className="w-3 h-3" aria-hidden="true" /> Zadzwoń teraz
+        <h2 className="eyebrow-muted mb-2">Telefon</h2>
+        <p className="text-2xl font-semibold text-ink-900 tracking-tight">{PHONE}</p>
+        <p className="text-[14px] text-ink-500 mt-1 mb-4">Poniedziałek - piątek, 10:00-18:00</p>
+        <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="btn-primary btn-sm">
+          <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Zadzwoń teraz
         </a>
       </div>
     </div>
 
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center shrink-0 text-skoczek-primary">
-        <Mail className="w-6 h-6" aria-hidden="true" />
-      </div>
+    <div className="flex items-start gap-5 p-6">
+      <Mail className="w-5 h-5 shrink-0 text-skoczek-primary mt-1" aria-hidden="true" />
       <div>
-        <h2 className="font-bold uppercase text-sm text-gray-400 mb-1">Email</h2>
-        <p className="font-bold text-lg text-black mb-2 break-all">{EMAIL}</p>
-        <a href={`mailto:${EMAIL}`} className="text-skoczek-primary text-sm font-bold uppercase border-b-2 border-skoczek-primary/20 hover:border-skoczek-primary transition pb-0.5">
-          Napisz wiadomość
-        </a>
+        <h2 className="eyebrow-muted mb-2">E-mail</h2>
+        <p className="text-[17px] font-medium text-ink-900 mb-2 break-all">{EMAIL}</p>
+        <a href={`mailto:${EMAIL}`} className="link-accent text-[14px]">Napisz wiadomość</a>
       </div>
     </div>
   </div>
@@ -295,10 +287,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
-      <div className="bg-white w-full max-w-md rounded-lg shadow-2xl overflow-hidden relative border border-gray-200">
+      <div className="bg-white w-full max-w-md border border-line relative">
         <button onClick={onClose} aria-label="Zamknij okno logowania" className="absolute top-4 right-4 text-gray-400 hover:text-black"><X /></button>
         <div className="p-8">
-          <h2 id="auth-modal-title" className="text-2xl font-bold text-skoczek-primary mb-2">
+          <h2 id="auth-modal-title" className="text-[22px] font-bold text-ink-900 tracking-tight mb-2">
             {isReset ? 'Nie pamiętasz hasła?' : isLogin ? 'Zaloguj się' : 'Utwórz konto'}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
@@ -331,27 +323,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
             {isRegister && (
               <>
                 <label className="sr-only" htmlFor="auth-name">Imię i nazwisko</label>
-                <input id="auth-name" required autoComplete="name" placeholder="Imię i Nazwisko" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
+                <input id="auth-name" required autoComplete="name" placeholder="Imię i Nazwisko" className="field"
                   value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 <label className="sr-only" htmlFor="auth-phone">Telefon</label>
-                <input id="auth-phone" required autoComplete="tel" type="tel" placeholder="Telefon" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
+                <input id="auth-phone" required autoComplete="tel" type="tel" placeholder="Telefon" className="field"
                   value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
               </>
             )}
             <label className="sr-only" htmlFor="auth-email">Adres e-mail</label>
-            <input id="auth-email" required type="email" autoComplete="email" placeholder="Email" className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
+            <input id="auth-email" required type="email" autoComplete="email" placeholder="Email" className="field"
               value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
             {!isReset && (
               <>
                 <label className="sr-only" htmlFor="auth-password">Hasło</label>
-                <input id="auth-password" required type="password" autoComplete={isLogin ? 'current-password' : 'new-password'} placeholder="Hasło (min. 8 znaków)" minLength={8} className="w-full bg-gray-50 border border-gray-300 rounded p-3 text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition"
+                <input id="auth-password" required type="password" autoComplete={isLogin ? 'current-password' : 'new-password'} placeholder="Hasło (min. 8 znaków)" minLength={8} className="field"
                   value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
               </>
             )}
 
             {isLogin && (
               <div className="text-right">
-                <button type="button" onClick={() => switchMode('reset')} className="text-xs font-bold text-gray-500 hover:text-skoczek-primary transition uppercase tracking-wide">
+                <button type="button" onClick={() => switchMode('reset')} className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400 hover:text-skoczek-primary transition-colors">
                   Nie pamiętasz hasła?
                 </button>
               </div>
@@ -360,7 +352,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
             {error && <p role="alert" className="text-red-600 text-sm font-medium bg-red-50 p-2 rounded">{error}</p>}
 
             <button disabled={loading} type="submit" className="w-full bg-skoczek-primary text-white font-bold py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wide disabled:opacity-50 flex justify-center">
-              {loading ? <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> : isReset ? 'Wyślij link' : isLogin ? 'Zaloguj' : 'Zarejestruj'}
+              {loading ? <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-[50%]"></span> : isReset ? 'Wyślij link' : isLogin ? 'Zaloguj' : 'Zarejestruj'}
             </button>
           </form>
           )}
@@ -368,13 +360,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess }) => {
           {!resetSent && (
             <div className="mt-6 text-center text-sm text-gray-500">
               {isReset ? (
-                <button onClick={() => switchMode('login')} className="text-skoczek-primary font-semibold hover:text-skoczek-primaryHover transition">
+                <button onClick={() => switchMode('login')} className="text-skoczek-primary font-medium hover:text-skoczek-primaryHover transition-colors">
                   Wróć do logowania
                 </button>
               ) : (
                 <>
                   {isLogin ? 'Nie masz konta? ' : 'Masz już konto? '}
-                  <button onClick={() => switchMode(isLogin ? 'register' : 'login')} className="text-skoczek-primary font-semibold hover:text-skoczek-primaryHover transition">
+                  <button onClick={() => switchMode(isLogin ? 'register' : 'login')} className="text-skoczek-primary font-medium hover:text-skoczek-primaryHover transition-colors">
                     {isLogin ? 'Zarejestruj się' : 'Zaloguj się'}
                   </button>
                 </>
@@ -421,14 +413,14 @@ const ContactInquiryForm: React.FC = () => {
   if (status === 'sent') {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-green-50 rounded border border-green-100 animate-fade-in">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-green-100 flex items-center justify-center mb-4">
           <CheckCircle className="w-8 h-8 text-green-600" />
         </div>
         <h3 className="text-xl font-bold text-green-800">Wiadomość wysłana!</h3>
         <p className="text-green-700 mt-2">Skontaktujemy się z Tobą najszybciej jak to możliwe.</p>
         <button
           onClick={() => setStatus('idle')}
-          className="mt-6 text-sm font-bold uppercase text-green-800 underline"
+          className="mt-6 text-[14px] font-medium text-green-800 underline underline-offset-4"
         >
           Wyślij kolejną wiadomość
         </button>
@@ -437,30 +429,33 @@ const ContactInquiryForm: React.FC = () => {
   }
 
   const inputClass =
-    'w-full bg-white border border-gray-300 rounded p-3 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition';
+    'field';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="font-black text-xl uppercase mb-4">Szybkie zapytanie</h2>
+      <div className="mb-6">
+        <p className="eyebrow mb-3">Wiadomość</p>
+        <h2 className="text-[22px] font-bold text-ink-900 tracking-tight">Szybkie zapytanie</h2>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="contact-name" className="block text-xs font-bold text-gray-500 uppercase mb-1">Imię</label>
+          <label htmlFor="contact-name" className="field-label">Imię</label>
           <input id="contact-name" required autoComplete="name" className={inputClass} value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
         </div>
         <div>
-          <label htmlFor="contact-email" className="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+          <label htmlFor="contact-email" className="field-label">Email</label>
           <input id="contact-email" required type="email" autoComplete="email" className={inputClass} value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
         </div>
       </div>
       <div>
-        <label htmlFor="contact-subject" className="block text-xs font-bold text-gray-500 uppercase mb-1">Temat</label>
+        <label htmlFor="contact-subject" className="field-label">Temat</label>
         <input id="contact-subject" required placeholder="np. Wycena serwisu RockShox Pike" className={inputClass} value={formData.subject}
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })} />
       </div>
       <div>
-        <label htmlFor="contact-message" className="block text-xs font-bold text-gray-500 uppercase mb-1">Wiadomość</label>
+        <label htmlFor="contact-message" className="field-label">Wiadomość</label>
         <textarea id="contact-message" required rows={4} placeholder="Twoja wiadomość..." className={inputClass} value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}></textarea>
       </div>
@@ -481,7 +476,7 @@ const ContactInquiryForm: React.FC = () => {
       </p>
 
       <button type="submit" disabled={status === 'sending'}
-        className="w-full bg-black text-white font-bold py-3 hover:bg-gray-800 transition flex items-center justify-center gap-2 uppercase text-sm tracking-wider disabled:opacity-50">
+        className="btn-dark w-full">
         {status === 'sending' ? 'Wysyłanie...' : 'Wyślij Wiadomość'} <Send className="w-4 h-4" />
       </button>
     </form>
@@ -615,7 +610,7 @@ const App: React.FC = () => {
   if (appLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-skoczek-primary">
-        <div className="animate-spin h-10 w-10 border-4 border-skoczek-primary border-t-transparent rounded-full" role="status" aria-label="Wczytywanie"></div>
+        <div className="animate-spin h-8 w-8 border-2 border-ink-200 border-t-skoczek-primary rounded-[50%]" role="status" aria-label="Wczytywanie"></div>
       </div>
     );
   }
@@ -631,32 +626,43 @@ const App: React.FC = () => {
         Przejdź do treści
       </a>
 
-      <div className="bg-skoczek-primary text-white text-xs py-2 px-4 text-center font-bold tracking-wider">
-        DARMOWA WYCENA SERWISU • WYSYŁKA Z CAŁEJ POLSKI
+      <div className="bg-ink-900 text-white border-b border-ink-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-center md:justify-between gap-4">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-300">
+            Darmowa wycena <span className="text-ink-600 mx-2">/</span> Wysyłka z całej Polski
+          </p>
+          <p className="hidden md:block font-mono text-[11px] uppercase tracking-[0.18em] text-ink-300">
+            Pn-Pt 10:00-18:00 <span className="text-ink-600 mx-2">/</span> {PHONE}
+          </p>
+        </div>
       </div>
 
-      <header className="sticky top-0 w-full z-40 bg-white border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 w-full z-40 bg-white/95 backdrop-blur border-b border-line">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Menu główne">
-          <div className="flex justify-between h-24 items-center">
-            <Link to="/" className="flex items-center gap-3" ariaLabel="Oddaj Amora - strona główna">
-              <div className="relative w-12 h-12 flex items-center justify-center">
+          <div className="flex justify-between h-20 items-center">
+            <Link to="/" className="flex items-center gap-3 group" ariaLabel="Oddaj Amora - strona główna">
+              <div className="relative w-9 h-9 flex items-center justify-center">
                 <SuspensionLogo className="w-full h-full text-skoczek-primary" />
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-2xl font-black tracking-tighter text-black uppercase">ODDAJ</span>
-                <span className="text-sm font-bold tracking-widest text-gray-500 uppercase">AMORA</span>
+                <span className="text-[19px] font-bold tracking-tight text-ink-900">
+                  Oddaj<span className="text-skoczek-primary">Amora</span>
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-400 mt-1">
+                  Serwis zawieszeń
+                </span>
               </div>
             </Link>
 
             <div className="hidden lg:flex items-center gap-8">
               <NavLink label="Start" to="/" />
               <NavLink label="Cennik" to="/cennik" />
-              <NavLink label="Zgłoś Serwis" to="/zglos-serwis" />
+              <NavLink label="Zgłoś serwis" to="/zglos-serwis" />
               <NavLink label="Regulamin" to="/regulamin" />
               <NavLink label="Kontakt" to="/kontakt" />
 
-              {user && user.role === UserRole.ADMIN && <NavLink label="Panel Mechanika" to="/panel-mechanika" />}
-              {user && user.role !== UserRole.ADMIN && <NavLink label="Moje Konto" to="/panel-klienta" />}
+              {user && user.role === UserRole.ADMIN && <NavLink label="Panel mechanika" to="/panel-mechanika" />}
+              {user && user.role !== UserRole.ADMIN && <NavLink label="Moje konto" to="/panel-klienta" />}
 
               <div className="h-6 w-px bg-gray-300 mx-2"></div>
 
@@ -674,9 +680,9 @@ const App: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="flex items-center gap-2 text-sm font-bold bg-gray-100 text-black hover:bg-gray-200 px-5 py-3 rounded-full transition uppercase"
+                  className="btn-ghost btn-sm"
                 >
-                  <UserIcon className="w-4 h-4" aria-hidden="true" /> Strefa Klienta
+                  <UserIcon className="w-4 h-4" aria-hidden="true" /> Strefa klienta
                 </button>
               )}
             </div>
@@ -696,14 +702,14 @@ const App: React.FC = () => {
           {mobileMenuOpen && (
             <div className="lg:hidden bg-white border-b border-gray-100 p-4 space-y-4 absolute left-0 w-full shadow-xl z-50">
               <div className="flex flex-col gap-4 text-center">
-                <NavLink label="Strona Główna" to="/" />
+                <NavLink label="Start" to="/" />
                 <NavLink label="Cennik" to="/cennik" />
-                <NavLink label="Zgłoś Serwis" to="/zglos-serwis" />
+                <NavLink label="Zgłoś serwis" to="/zglos-serwis" />
                 <NavLink label="Regulamin" to="/regulamin" />
                 <NavLink label="Kontakt" to="/kontakt" />
 
-                {user && user.role === UserRole.ADMIN && <NavLink label="Panel Mechanika" to="/panel-mechanika" />}
-                {user && user.role !== UserRole.ADMIN && <NavLink label="Moje Konto" to="/panel-klienta" />}
+                {user && user.role === UserRole.ADMIN && <NavLink label="Panel mechanika" to="/panel-mechanika" />}
+                {user && user.role !== UserRole.ADMIN && <NavLink label="Moje konto" to="/panel-klienta" />}
 
                 <hr className="border-gray-100" />
                 {user ? (
@@ -723,188 +729,185 @@ const App: React.FC = () => {
       <main id="main" className="flex-grow">
         {view === 'HOME' && (
           <>
-            <section className="relative py-20 lg:py-32 bg-white overflow-hidden">
-              <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <svg className="absolute top-0 left-0 w-full h-full opacity-[0.03]" width="100%" height="100%">
-                  <defs>
-                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="black" strokeWidth="1"/>
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
+            <section className="relative border-b border-line bg-white overflow-hidden">
+              <div className="absolute inset-0 z-0 bg-blueprint pointer-events-none" aria-hidden="true"></div>
+              <div className="absolute right-0 top-0 bottom-0 hidden lg:block w-px bg-line" aria-hidden="true"></div>
 
-                <div className="absolute right-0 top-0 h-full w-1/2 md:w-1/3 hidden md:flex items-center justify-center opacity-[0.05]">
-                  <SuspensionLogo className="h-[600px] w-auto text-black" />
-                </div>
-              </div>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 lg:gap-16 py-16 lg:py-24">
+                <div className="lg:col-span-7">
+                  <p className="eyebrow mb-6">01 &mdash; Serwis zawieszenia rowerowego</p>
 
-              <div className="max-w-7xl mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-12">
-                <div className="flex-1 text-center md:text-left">
-                  <p className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 font-bold text-xs px-3 py-1 rounded mb-6 uppercase tracking-widest">
-                    <CheckCircle className="w-3 h-3 text-skoczek-primary" aria-hidden="true" /> Łapy k. Białegostoku · Autoryzowany punkt serwisowy
-                  </p>
-
-                  <h1 className="text-4xl md:text-6xl font-black text-black uppercase leading-tight tracking-tight mb-6 pl-0 md:pl-6 border-l-0 md:border-l-4 border-skoczek-primary">
-                    Serwis amortyzatorów<br className="hidden md:block" /> rowerowych
+                  <h1 className="text-[2.6rem] leading-[1.05] md:text-6xl md:leading-[1.03] font-bold text-ink-900 tracking-tightest mb-7">
+                    Serwis amortyzatorów<br className="hidden sm:block" /> i damperów rowerowych
                   </h1>
 
-                  <p className="text-gray-600 text-lg mb-8 max-w-xl font-medium leading-relaxed">
-                    Kompleksowo zajmiemy się zawieszeniem w Twoim rowerze. Serwis olejowy, wymiana
-                    uszczelek, naprawa i ustawienie amortyzatorów oraz damperów marek FOX, RockShox,
-                    Marzocchi, Öhlins, Manitou i SR Suntour. Przyjmujemy sprzęt osobiście w Łapach
-                    koło Białegostoku i kurierem z całej Polski.
+                  <span className="rule-accent mb-7" aria-hidden="true"></span>
+
+                  <p className="text-ink-600 text-[17px] leading-relaxed max-w-2xl mb-10">
+                    Serwis olejowy, wymiana uszczelek, naprawa i ustawienie zawieszenia marek FOX,
+                    RockShox, Marzocchi, Öhlins, Manitou i SR Suntour. Sprzęt przyjmujemy osobiście
+                    w Łapach koło Białegostoku oraz kurierem z całej Polski.
                   </p>
 
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <Link to="/zglos-serwis" className="bg-skoczek-primary text-white font-black px-8 py-3 rounded hover:bg-skoczek-primaryHover shadow-lg shadow-skoczek-primary/30 transition duration-300 flex items-center justify-center gap-2 uppercase tracking-wider text-sm group">
-                      Zleć Naprawę <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" aria-hidden="true" />
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link to="/zglos-serwis" className="btn-primary group">
+                      Zleć naprawę
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
                     </Link>
-                    <Link to="/cennik" className="bg-white text-gray-900 border border-gray-300 font-black px-8 py-3 rounded hover:border-skoczek-primary hover:text-skoczek-primary transition duration-300 uppercase tracking-wider text-sm flex items-center justify-center">
-                      Zobacz Cennik
-                    </Link>
+                    <Link to="/cennik" className="btn-ghost">Zobacz cennik</Link>
                   </div>
                 </div>
 
-                <div className="hidden md:block w-1/3 h-64 bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl shadow-inner relative overflow-hidden group">
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-200 group-hover:text-skoczek-primary/20 transition duration-700">
-                    <SuspensionLogo className="w-32 h-32" />
-                  </div>
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <div className="text-sm font-bold text-black uppercase mb-1">Szybka realizacja</div>
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full w-3/4 bg-skoczek-primary"></div>
+                <div className="lg:col-span-5 lg:border-l lg:border-line lg:pl-12">
+                  <dl className="divide-y divide-line border-y border-line">
+                    {[
+                      ['Punkt serwisowy', 'ul. Główna 123, Łapy'],
+                      ['Wycena', 'do 3 dni roboczych'],
+                      ['Gwarancja', '12 miesięcy na usługę'],
+                      ['Wysyłka', 'kurierem, cała Polska'],
+                    ].map(([term, value]) => (
+                      <div key={term} className="flex items-baseline justify-between gap-6 py-4">
+                        <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400">{term}</dt>
+                        <dd className="text-[15px] font-medium text-ink-900 text-right">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+
+                  <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="mt-8 flex items-center justify-between border border-line-strong px-5 py-4 hover:border-ink-900 transition-colors group">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400">Zadzwoń</span>
+                    <span className="text-lg font-semibold text-ink-900 group-hover:text-skoczek-primary transition-colors">{PHONE}</span>
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <section className="border-b border-line bg-white" aria-label="Dlaczego my">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 lg:divide-x divide-line border-line">
+                  {[
+                    { n: '01', t: 'Gwarancja', d: '12 miesięcy na robociznę i części' },
+                    { n: '02', t: 'Oryginalne części', d: 'Komponenty i oleje producentów' },
+                    { n: '03', t: 'Lokalizacja', d: 'Łapy, powiat białostocki' },
+                    { n: '04', t: 'Doradztwo', d: 'Dobór ustawień pod wagę i styl jazdy' },
+                  ].map((item, i) => (
+                    <div
+                      key={item.n}
+                      className={`py-8 lg:px-8 ${i % 2 === 0 ? 'pr-6 lg:pr-8 border-r border-line lg:border-r-0' : 'pl-6 lg:pl-8'} ${i < 2 ? 'border-b border-line lg:border-b-0' : ''} ${i === 0 ? 'lg:pl-0' : ''} ${i === 3 ? 'lg:pr-0' : ''}`}
+                    >
+                      <span className="font-mono text-[11px] tracking-[0.18em] text-skoczek-primary">{item.n}</span>
+                      <h2 className="text-[15px] font-semibold text-ink-900 mt-3">{item.t}</h2>
+                      <p className="text-[13px] text-ink-500 mt-1.5 leading-relaxed">{item.d}</p>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </section>
 
-            <section className="border-y border-gray-100 bg-gray-50/50 py-12" aria-label="Dlaczego my">
-              <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3 pl-4 md:pl-0">
-                  <ShieldCheck className="w-8 h-8 text-skoczek-primary mb-1" aria-hidden="true" />
-                  <div>
-                    <h2 className="font-bold text-black uppercase text-sm">Gwarancja</h2>
-                    <p className="text-xs text-gray-500 mt-1">12 miesięcy na usługi</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3">
-                  <SuspensionLogo className="w-8 h-8 text-skoczek-primary mb-1" />
-                  <div>
-                    <h2 className="font-bold text-black uppercase text-sm">Oryginalne Części</h2>
-                    <p className="text-xs text-gray-500 mt-1">Korzystamy wyłącznie z najwyższej jakości produktów</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3">
-                  <MapPin className="w-8 h-8 text-skoczek-primary mb-1" aria-hidden="true" />
-                  <div>
-                    <h2 className="font-bold text-black uppercase text-sm">Lokalizacja</h2>
-                    <p className="text-xs text-gray-500 mt-1">Łapy k. Białegostoku</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3">
-                  <Phone className="w-8 h-8 text-skoczek-primary mb-1" aria-hidden="true" />
-                  <div>
-                    <h2 className="font-bold text-black uppercase text-sm">Wsparcie</h2>
-                    <p className="text-xs text-gray-500 mt-1">Doradztwo techniczne</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="py-20 px-4 max-w-7xl mx-auto" aria-labelledby="uslugi-heading">
-              <div className="mb-10">
-                <h2 id="uslugi-heading" className="text-3xl font-black text-black uppercase tracking-tight">Zakres usług serwisowych</h2>
-                <p className="text-gray-500 mt-2 max-w-3xl">
-                  Serwisujemy zawieszenie rowerów MTB, gravel i e-bike - od prostego serwisu olejowego
-                  po pełną regenerację z wymianą uszczelek i tulei ślizgowych.
+            <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" aria-labelledby="uslugi-heading">
+              <div className="mb-12 max-w-3xl">
+                <p className="eyebrow mb-4">02 &mdash; Zakres prac</p>
+                <h2 id="uslugi-heading" className="text-3xl md:text-[2.5rem] md:leading-[1.1] font-bold text-ink-900 tracking-tighter">
+                  Co serwisujemy
+                </h2>
+                <p className="text-ink-600 mt-5 text-[17px] leading-relaxed">
+                  Zawieszenie rowerów MTB, gravel i e-bike &mdash; od serwisu olejowego po pełną
+                  regenerację z wymianą uszczelek i tulei ślizgowych.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <Wrench className="w-8 h-8 text-skoczek-primary mb-4" aria-hidden="true" />
-                  <h3 className="font-black text-lg uppercase text-black mb-2">Amortyzatory przednie</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              <div className="grid md:grid-cols-3 border-t border-line">
+                <article className="border-b md:border-b-0 md:border-r border-line py-8 md:pr-8">
+                  <Wrench className="w-6 h-6 text-skoczek-primary mb-5" aria-hidden="true" />
+                  <h3 className="text-lg font-semibold text-ink-900 mb-3">Amortyzatory przednie</h3>
+                  <p className="text-[15px] text-ink-600 leading-relaxed mb-5">
                     Serwis widelców RockShox (Pike, Lyrik, SID, Judy, Reba), FOX (32, 34, 36, 38, 40),
                     Manitou, DT Swiss, SR Suntour, Marzocchi, DVO, Öhlins oraz Cannondale Lefty.
                     Wymiana oleju, uszczelek, tulei i serwis kartridża.
                   </p>
                   {frontFrom && (
-                    <p className="text-sm font-black text-skoczek-primary uppercase">już od {frontFrom} zł</p>
+                    <p className="font-mono text-[12px] tracking-[0.1em] text-ink-900">od <span className="text-skoczek-primary font-medium">{frontFrom} zł</span></p>
                   )}
                 </article>
 
-                <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <Package className="w-8 h-8 text-skoczek-primary mb-4" aria-hidden="true" />
-                  <h3 className="font-black text-lg uppercase text-black mb-2">Amortyzatory tylne (dampery)</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                <article className="border-b md:border-b-0 md:border-r border-line py-8 md:px-8">
+                  <Package className="w-6 h-6 text-skoczek-primary mb-5" aria-hidden="true" />
+                  <h3 className="text-lg font-semibold text-ink-900 mb-3">Amortyzatory tylne (dampery)</h3>
+                  <p className="text-[15px] text-ink-600 leading-relaxed mb-5">
                     Serwis damperów powietrznych i sprężynowych: RockShox Monarch, Deluxe, Super Deluxe,
                     Vivid, FOX Float DPS, DPX2, X2, DHX, Manitou, Cane Creek, Öhlins TTX i DT Swiss.
                   </p>
                   {rearFrom && (
-                    <p className="text-sm font-black text-skoczek-primary uppercase">już od {rearFrom} zł</p>
+                    <p className="font-mono text-[12px] tracking-[0.1em] text-ink-900">od <span className="text-skoczek-primary font-medium">{rearFrom} zł</span></p>
                   )}
                 </article>
 
-                <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <Truck className="w-8 h-8 text-skoczek-primary mb-4" aria-hidden="true" />
-                  <h3 className="font-black text-lg uppercase text-black mb-2">Sztyce i montaż</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                <article className="py-8 md:pl-8">
+                  <Truck className="w-6 h-6 text-skoczek-primary mb-5" aria-hidden="true" />
+                  <h3 className="text-lg font-semibold text-ink-900 mb-3">Sztyce i montaż</h3>
+                  <p className="text-[15px] text-ink-600 leading-relaxed mb-5">
                     Serwis sztyc regulowanych (dropperów) hydraulicznych i mechanicznych, montaż
                     i demontaż amortyzatora lub dampera w ramie, doradztwo przy doborze ustawień.
                   </p>
                   {otherFrom && (
-                    <p className="text-sm font-black text-skoczek-primary uppercase">już od {otherFrom} zł</p>
+                    <p className="font-mono text-[12px] tracking-[0.1em] text-ink-900">od <span className="text-skoczek-primary font-medium">{otherFrom} zł</span></p>
                   )}
                 </article>
               </div>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Link to="/cennik" className="bg-skoczek-primary text-white font-black px-8 py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+              <div className="mt-10 pt-10 border-t border-line flex flex-col sm:flex-row gap-3">
+                <Link to="/cennik" className="btn-primary">
                   Pełny cennik usług <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </Link>
-                <Link to="/zglos-serwis" className="bg-white text-gray-900 border border-gray-300 font-black px-8 py-3 rounded hover:border-skoczek-primary hover:text-skoczek-primary transition uppercase tracking-wider text-sm flex items-center justify-center">
-                  Zgłoś serwis online
-                </Link>
+                <Link to="/zglos-serwis" className="btn-ghost">Zgłoś serwis online</Link>
               </div>
             </section>
 
-            <section className="bg-gray-50 border-y border-gray-100 py-20 px-4" aria-labelledby="proces-heading">
+            <section className="bg-ink-50 border-y border-line py-20 px-4 sm:px-6 lg:px-8" aria-labelledby="proces-heading">
               <div className="max-w-7xl mx-auto">
-                <h2 id="proces-heading" className="text-3xl font-black text-black uppercase tracking-tight mb-10">Jak przebiega serwis</h2>
-                <ol className="grid md:grid-cols-4 gap-6">
+                <p className="eyebrow mb-4">03 &mdash; Przebieg zlecenia</p>
+                <h2 id="proces-heading" className="text-3xl md:text-[2.5rem] md:leading-[1.1] font-bold text-ink-900 tracking-tighter mb-12">
+                  Jak przebiega serwis
+                </h2>
+                <ol className="grid md:grid-cols-4 border-t border-line bg-white">
                   {[
-                    { icon: <Send className="w-6 h-6" aria-hidden="true" />, title: '1. Zgłoszenie', text: 'Wypełniasz formularz serwisowy online - opisujesz model i usterkę.' },
-                    { icon: <Truck className="w-6 h-6" aria-hidden="true" />, title: '2. Dostarczenie', text: 'Przywozisz sprzęt na ul. Główną 123 w Łapach lub wysyłasz kurierem.' },
-                    { icon: <Clock className="w-6 h-6" aria-hidden="true" />, title: '3. Diagnoza i wycena', text: 'W ciągu maksymalnie 3 dni roboczych otrzymujesz szczegółową wycenę do akceptacji.' },
-                    { icon: <CheckCircle className="w-6 h-6" aria-hidden="true" />, title: '4. Naprawa i zwrot', text: 'Po akceptacji wykonujemy serwis i odsyłamy sprzęt - z 12-miesięczną gwarancją.' },
-                  ].map((step) => (
-                    <li key={step.title} className="bg-white border border-gray-200 rounded-xl p-6">
-                      <div className="w-12 h-12 rounded bg-skoczek-light text-skoczek-primary flex items-center justify-center mb-4">
-                        {step.icon}
+                    { n: '01', icon: <Send className="w-5 h-5" aria-hidden="true" />, title: 'Zgłoszenie', text: 'Wypełniasz formularz serwisowy online - opisujesz model i usterkę.' },
+                    { n: '02', icon: <Truck className="w-5 h-5" aria-hidden="true" />, title: 'Dostarczenie', text: 'Przywozisz sprzęt na ul. Główną 123 w Łapach lub wysyłasz kurierem.' },
+                    { n: '03', icon: <Clock className="w-5 h-5" aria-hidden="true" />, title: 'Diagnoza i wycena', text: 'W ciągu maksymalnie 3 dni roboczych otrzymujesz szczegółową wycenę do akceptacji.' },
+                    { n: '04', icon: <CheckCircle className="w-5 h-5" aria-hidden="true" />, title: 'Naprawa i zwrot', text: 'Po akceptacji wykonujemy serwis i odsyłamy sprzęt - z 12-miesięczną gwarancją.' },
+                  ].map((step, i) => (
+                    <li
+                      key={step.n}
+                      className={`p-8 border-line border-b md:border-b-0 ${i < 3 ? 'md:border-r' : ''}`}
+                    >
+                      <div className="flex items-center justify-between mb-6">
+                        <span className="font-mono text-[11px] tracking-[0.18em] text-skoczek-primary">{step.n}</span>
+                        <span className="text-ink-300">{step.icon}</span>
                       </div>
-                      <h3 className="font-black uppercase text-black text-sm mb-2">{step.title}</h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">{step.text}</p>
+                      <h3 className="text-[15px] font-semibold text-ink-900 mb-2">{step.title}</h3>
+                      <p className="text-[14px] text-ink-500 leading-relaxed">{step.text}</p>
                     </li>
                   ))}
                 </ol>
               </div>
             </section>
 
-            <section className="py-20 px-4 max-w-4xl mx-auto" aria-labelledby="faq-heading">
-              <h2 id="faq-heading" className="text-3xl font-black text-black uppercase tracking-tight mb-2">Najczęstsze pytania</h2>
-              <p className="text-gray-500 mb-8">Serwis amortyzatorów - koszty, terminy, wysyłka i gwarancja.</p>
+            <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto" aria-labelledby="faq-heading">
+              <p className="eyebrow mb-4">04 &mdash; Pytania i odpowiedzi</p>
+              <h2 id="faq-heading" className="text-3xl md:text-[2.5rem] md:leading-[1.1] font-bold text-ink-900 tracking-tighter mb-3">
+                Najczęstsze pytania
+              </h2>
+              <p className="text-ink-500 mb-10 text-[15px]">Koszty, terminy, wysyłka i gwarancja.</p>
 
-              <div className="space-y-3">
+              <div className="border-t border-line">
                 {FAQ_ITEMS.map((item) => (
-                  <details key={item.q} className="group bg-white border border-gray-200 rounded-xl p-5 open:shadow-sm">
-                    <summary className="font-bold text-black cursor-pointer list-none flex items-start justify-between gap-4">
-                      <h3 className="text-base font-bold">{item.q}</h3>
-                      <ChevronRight className="w-5 h-5 text-skoczek-primary shrink-0 transition group-open:rotate-90" aria-hidden="true" />
+                  <details key={item.q} className="group border-b border-line py-5">
+                    <summary className="cursor-pointer list-none flex items-start justify-between gap-6">
+                      <h3 className="text-[16px] font-medium text-ink-900 group-open:text-skoczek-primary transition-colors">{item.q}</h3>
+                      <span className="shrink-0 mt-1 text-ink-400 group-open:text-skoczek-primary transition-colors">
+                        <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90" aria-hidden="true" />
+                      </span>
                     </summary>
-                    <p className="text-gray-600 text-sm leading-relaxed mt-4">{item.a}</p>
+                    <p className="text-ink-600 text-[15px] leading-relaxed mt-4 max-w-3xl">{item.a}</p>
                   </details>
                 ))}
               </div>
@@ -922,46 +925,48 @@ const App: React.FC = () => {
               />
             </section>
 
-            <section className="bg-gray-900 text-white py-20 relative overflow-hidden" aria-labelledby="kontakt-heading">
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]" aria-hidden="true"></div>
-
-              <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
+            <section className="bg-ink-900 text-white border-t border-ink-800" aria-labelledby="kontakt-heading">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid lg:grid-cols-2 gap-14 lg:gap-20 items-start">
                 <div>
-                  <h2 id="kontakt-heading" className="text-2xl font-black mb-8 uppercase tracking-wide border-l-4 border-skoczek-primary pl-4">Kontakt</h2>
-                  <div className="space-y-8">
-                    <div className="flex gap-6">
-                      <div className="w-10 h-10 bg-gray-800 flex items-center justify-center text-white shrink-0 rounded">
-                        <MapPin className="w-5 h-5" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg">Adres Serwisu</h3>
-                        <p className="text-gray-400 mt-1 text-sm leading-relaxed">ul. Główna 123<br/>18-100 Łapy<br/>(powiat białostocki)</p>
-                      </div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-skoczek-primary mb-4">05 &mdash; Kontakt</p>
+                  <h2 id="kontakt-heading" className="text-3xl md:text-[2.5rem] md:leading-[1.1] font-bold tracking-tighter mb-10">
+                    Przyjmujemy sprzęt osobiście i kurierem
+                  </h2>
+
+                  <dl className="border-t border-ink-700">
+                    <div className="py-5 border-b border-ink-700 flex items-start justify-between gap-8">
+                      <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400 pt-1">Adres</dt>
+                      <dd className="text-[15px] leading-relaxed text-right">
+                        ul. Główna 123<br />18-100 Łapy<br />
+                        <span className="text-ink-400">powiat białostocki</span>
+                      </dd>
                     </div>
 
-                    <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="flex gap-6 group cursor-pointer hover:bg-white/5 p-2 -ml-2 rounded transition">
-                      <div className="w-10 h-10 bg-gray-800 group-hover:bg-skoczek-primary transition flex items-center justify-center text-white shrink-0 rounded">
-                        <Phone className="w-5 h-5" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg flex items-center gap-2">Infolinia <span className="text-xs font-normal bg-skoczek-primary px-1.5 rounded">Zadzwoń</span></h3>
-                        <p className="text-gray-400 mt-1 text-sm group-hover:text-white transition">{PHONE}<br/><span className="text-gray-600 group-hover:text-gray-400">Pn-Pt 10:00 - 18:00</span></p>
-                      </div>
-                    </a>
+                    <div className="py-5 border-b border-ink-700 flex items-center justify-between gap-8">
+                      <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400">Telefon</dt>
+                      <dd className="text-right">
+                        <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="text-lg font-semibold hover:text-skoczek-primary transition-colors">{PHONE}</a>
+                        <span className="block text-[13px] text-ink-400 mt-0.5">Pn-Pt 10:00-18:00</span>
+                      </dd>
+                    </div>
 
-                    <Link to="/kontakt" className="flex gap-6 group cursor-pointer hover:bg-white/5 p-2 -ml-2 rounded transition w-full text-left">
-                      <div className="w-10 h-10 bg-gray-800 group-hover:bg-skoczek-primary transition flex items-center justify-center text-white shrink-0 rounded">
-                        <Mail className="w-5 h-5" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg flex items-center gap-2">Email <span className="text-xs font-normal bg-skoczek-primary px-1.5 rounded">Napisz</span></h3>
-                        <p className="text-gray-400 mt-1 text-sm group-hover:text-white transition break-all">{EMAIL}</p>
-                      </div>
+                    <div className="py-5 border-b border-ink-700 flex items-center justify-between gap-8">
+                      <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-400">E-mail</dt>
+                      <dd className="text-right">
+                        <a href={`mailto:${EMAIL}`} className="text-[15px] hover:text-skoczek-primary transition-colors break-all">{EMAIL}</a>
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div className="flex flex-col sm:flex-row gap-3 mt-10">
+                    <Link to="/zglos-serwis" className="btn-primary">Zleć naprawę</Link>
+                    <Link to="/kontakt" className="btn inline-flex border-ink-600 text-white hover:border-white">
+                      Formularz kontaktowy
                     </Link>
                   </div>
                 </div>
 
-                <div className="h-[350px] w-full bg-gray-800 rounded border border-gray-700 shadow-2xl overflow-hidden">
+                <div className="h-[420px] w-full border border-ink-700 overflow-hidden">
                   <MapComponent consent={cookieConsent} onAccept={acceptCookiesFromMap} />
                 </div>
               </div>
@@ -972,22 +977,24 @@ const App: React.FC = () => {
         {view === 'PRICING' && (
           <div className="bg-white py-16">
             <div className="max-w-7xl mx-auto px-4">
-              <header className="mb-10 border-b border-gray-100 pb-8">
-                <h1 className="text-3xl md:text-4xl font-black text-black uppercase tracking-tight border-l-4 border-skoczek-primary pl-6">
+              <header className="mb-12 border-b border-line pb-10">
+                <p className="eyebrow mb-4">Cennik</p>
+                <h1 className="text-3xl md:text-[2.75rem] md:leading-[1.08] font-bold text-ink-900 tracking-tightest">
                   Cennik serwisu amortyzatorów
                 </h1>
-                <p className="text-gray-600 mt-4 max-w-3xl leading-relaxed">
+                <span className="rule-accent mt-6 mb-6" aria-hidden="true"></span>
+                <p className="text-ink-600 max-w-3xl leading-relaxed text-[17px]">
                   Poniżej znajdziesz orientacyjne ceny serwisu amortyzatorów przednich, damperów
                   i sztyc regulowanych (ceny brutto w PLN). Kolumna &bdquo;cena serwisu&rdquo; obejmuje
                   robociznę i olej, a &bdquo;z uszczelkami&rdquo; - pełny serwis wraz z kompletem uszczelek.
                   Ostateczny koszt potwierdzamy wyceną po diagnozie sprzętu, a każda zmiana zakresu prac
                   wymaga Twojej akceptacji.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 mt-6">
-                  <Link to="/zglos-serwis" className="bg-skoczek-primary text-white font-black px-8 py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-3 mt-8">
+                  <Link to="/zglos-serwis" className="btn-primary">
                     Zgłoś serwis <ChevronRight className="w-4 h-4" aria-hidden="true" />
                   </Link>
-                  <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="bg-white text-gray-900 border border-gray-300 font-black px-8 py-3 rounded hover:border-skoczek-primary hover:text-skoczek-primary transition uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                  <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="btn-ghost">
                     <Phone className="w-4 h-4" aria-hidden="true" /> {PHONE}
                   </a>
                 </div>
@@ -995,11 +1002,11 @@ const App: React.FC = () => {
 
               <PricingTables categories={pricing} />
 
-              <p className="text-sm text-gray-500 mt-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
+              <p className="text-[14px] text-ink-500 mt-12 border-l-2 border-skoczek-primary bg-ink-50 px-6 py-5 leading-relaxed">
                 Ceny mają charakter informacyjny i nie stanowią oferty w rozumieniu Kodeksu cywilnego.
                 Koszt części zamiennych oraz przesyłki zwrotnej doliczany jest do wyceny. Szczegółowe
                 zasady realizacji zleceń opisuje{' '}
-                <Link to="/regulamin" className="text-skoczek-primary font-bold underline">regulamin serwisu</Link>.
+                <Link to="/regulamin" className="link-accent">regulamin serwisu</Link>.
               </p>
             </div>
           </div>
@@ -1008,12 +1015,14 @@ const App: React.FC = () => {
         {view === 'REGULATIONS' && (
           <div className="bg-gray-50 py-16 min-h-[calc(100vh-theme(spacing.24))]">
             <div className="max-w-4xl mx-auto px-4">
-              <div className="bg-white p-8 md:p-12 rounded-xl shadow-sm border border-gray-200">
-                <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-8 border-l-4 border-skoczek-primary pl-6">Regulamin Serwisu</h1>
-                <p className="text-gray-600 mb-6 font-medium">
-                  Prosimy o zapoznanie się z poniższymi zasadami świadczenia usług serwisowych przez Oddaj Amora.
+              <div className="panel p-8 md:p-12">
+                <p className="eyebrow mb-4">Dokument</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-ink-900 tracking-tighter mb-6">Regulamin serwisu</h1>
+                <span className="rule-accent mb-7" aria-hidden="true"></span>
+                <p className="text-ink-600 mb-8 text-[16px] leading-relaxed">
+                  Zasady świadczenia usług serwisowych przez Oddaj Amora.
                 </p>
-                <div className="bg-gray-50 p-6 rounded border border-gray-200 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed">
+                <div className="border-t border-line pt-8 text-ink-700 text-[14px] whitespace-pre-wrap leading-[1.75] font-[450]">
                   {FULL_REGULATIONS}
                 </div>
               </div>
@@ -1024,9 +1033,11 @@ const App: React.FC = () => {
         {view === 'PRIVACY' && (
           <div className="bg-gray-50 py-16 min-h-[calc(100vh-theme(spacing.24))]">
             <div className="max-w-4xl mx-auto px-4">
-              <div className="bg-white p-8 md:p-12 rounded-xl shadow-sm border border-gray-200">
-                <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-8 border-l-4 border-skoczek-primary pl-6">Polityka Prywatności i RODO</h1>
-                <div className="bg-gray-50 p-6 rounded border border-gray-200 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed">
+              <div className="panel p-8 md:p-12">
+                <p className="eyebrow mb-4">Dokument</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-ink-900 tracking-tighter mb-6">Polityka prywatności i RODO</h1>
+                <span className="rule-accent mb-7" aria-hidden="true"></span>
+                <div className="border-t border-line pt-8 text-ink-700 text-[14px] whitespace-pre-wrap leading-[1.75] font-[450]">
                   {PRIVACY_POLICY}
                 </div>
               </div>
@@ -1040,8 +1051,9 @@ const App: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-12">
                 <div className="md:w-1/2 space-y-8">
                   <div>
-                    <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-2">Kontakt</h1>
-                    <p className="text-gray-500">
+                    <p className="eyebrow mb-4">Kontakt</p>
+                    <h1 className="text-3xl md:text-[2.5rem] md:leading-[1.1] font-bold text-ink-900 tracking-tighter mb-4">Napisz lub zadzwoń</h1>
+                    <p className="text-ink-600 text-[16px] leading-relaxed">
                       Serwis amortyzatorów rowerowych Oddaj Amora - Łapy koło Białegostoku,
                       ul. Główna 123. Wybierz preferowaną formę kontaktu.
                     </p>
@@ -1049,13 +1061,13 @@ const App: React.FC = () => {
 
                   <ContactDetails />
 
-                  <div className="h-[280px] w-full bg-gray-800 rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="h-[280px] w-full border border-line overflow-hidden">
                     <MapComponent consent={cookieConsent} onAccept={acceptCookiesFromMap} />
                   </div>
                 </div>
 
                 <div className="md:w-1/2">
-                  <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
+                  <div className="panel p-8">
                     <ContactInquiryForm />
                   </div>
                 </div>
@@ -1106,64 +1118,62 @@ const App: React.FC = () => {
         {view === 'NOT_FOUND' && (
           <div className="bg-gray-50 py-24 min-h-[calc(100vh-theme(spacing.24))]">
             <div className="max-w-2xl mx-auto px-4 text-center">
-              <p className="text-skoczek-primary font-black text-6xl mb-4">404</p>
-              <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-4">Nie znaleziono strony</h1>
-              <p className="text-gray-600 mb-8">
+              <p className="font-mono text-skoczek-primary text-5xl mb-6 tracking-tight">404</p>
+              <h1 className="text-3xl font-bold text-ink-900 tracking-tighter mb-4">Nie znaleziono strony</h1>
+              <p className="text-ink-600 mb-10 text-[16px] leading-relaxed">
                 Strona o tym adresie nie istnieje lub została przeniesiona. Sprawdź cennik, zgłoś
                 serwis albo wróć na stronę główną.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/" className="bg-skoczek-primary text-white font-black px-8 py-3 rounded hover:bg-skoczek-primaryHover transition uppercase tracking-wider text-sm">
-                  Strona główna
-                </Link>
-                <Link to="/cennik" className="bg-white text-gray-900 border border-gray-300 font-black px-8 py-3 rounded hover:border-skoczek-primary transition uppercase tracking-wider text-sm">
-                  Cennik
-                </Link>
+                <Link to="/" className="btn-primary">Strona główna</Link>
+                <Link to="/cennik" className="btn-ghost">Cennik</Link>
               </div>
             </div>
           </div>
         )}
       </main>
 
-      <footer className="bg-white border-t border-gray-200 py-12">
-        <div className="max-w-7xl mx-auto px-4 grid gap-10 md:grid-cols-3">
+      <footer className="bg-white border-t border-line pt-16 pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-12 md:grid-cols-3">
           <div>
-            <p className="text-xl font-black text-black uppercase tracking-tighter">ODDAJ <span className="text-skoczek-primary">AMORA</span></p>
-            <p className="text-gray-500 text-sm mt-3 leading-relaxed">
+            <p className="text-[19px] font-bold tracking-tight text-ink-900">
+              Oddaj<span className="text-skoczek-primary">Amora</span>
+            </p>
+            <p className="text-ink-500 text-[14px] mt-4 leading-relaxed max-w-xs">
               Profesjonalny serwis amortyzatorów i damperów rowerowych w Łapach koło Białegostoku.
               Przyjmujemy sprzęt osobiście oraz kurierem z całej Polski.
             </p>
           </div>
 
           <div>
-            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Dane kontaktowe</h2>
-            <address className="not-italic text-sm text-gray-600 space-y-2">
+            <h2 className="eyebrow-muted mb-5">Dane kontaktowe</h2>
+            <address className="not-italic text-[14px] text-ink-600 space-y-2.5">
               <p>ul. Główna 123, 18-100 Łapy</p>
               <p>
-                <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="hover:text-skoczek-primary transition font-bold">{PHONE}</a>
+                <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="font-medium text-ink-900 hover:text-skoczek-primary transition-colors">{PHONE}</a>
               </p>
               <p>
-                <a href={`mailto:${EMAIL}`} className="hover:text-skoczek-primary transition break-all">{EMAIL}</a>
+                <a href={`mailto:${EMAIL}`} className="hover:text-skoczek-primary transition-colors break-all">{EMAIL}</a>
               </p>
-              <p className="text-gray-400">Pn-Pt 10:00 - 18:00</p>
+              <p className="font-mono text-[12px] text-ink-400 pt-1">Pn-Pt 10:00-18:00</p>
             </address>
           </div>
 
           <div>
-            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Serwis</h2>
-            <ul className="text-sm text-gray-600 space-y-2">
-              <li><Link to="/cennik" className="hover:text-skoczek-primary transition">Cennik usług</Link></li>
-              <li><Link to="/zglos-serwis" className="hover:text-skoczek-primary transition">Zgłoś serwis</Link></li>
-              <li><Link to="/kontakt" className="hover:text-skoczek-primary transition">Kontakt</Link></li>
-              <li><Link to="/regulamin" className="hover:text-skoczek-primary transition">Regulamin</Link></li>
-              <li><Link to="/polityka-prywatnosci" className="hover:text-skoczek-primary transition">Polityka prywatności i RODO</Link></li>
+            <h2 className="eyebrow-muted mb-5">Serwis</h2>
+            <ul className="text-[14px] text-ink-600 space-y-2.5">
+              <li><Link to="/cennik" className="hover:text-skoczek-primary transition-colors">Cennik usług</Link></li>
+              <li><Link to="/zglos-serwis" className="hover:text-skoczek-primary transition-colors">Zgłoś serwis</Link></li>
+              <li><Link to="/kontakt" className="hover:text-skoczek-primary transition-colors">Kontakt</Link></li>
+              <li><Link to="/regulamin" className="hover:text-skoczek-primary transition-colors">Regulamin</Link></li>
+              <li><Link to="/polityka-prywatnosci" className="hover:text-skoczek-primary transition-colors">Polityka prywatności i RODO</Link></li>
             </ul>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 mt-10 pt-8 border-t border-gray-100 text-center text-gray-400 text-xs space-y-1">
-          <p>&copy; {new Date().getFullYear()} Oddaj Amora - {SITE_URL.replace(/^https?:\/\//, '')}</p>
-          <p>Skoczek Suspension Tomasz Pierzchało, ul. Główna 123, 18-100 Łapy, NIP 5423158283, REGON 523948292</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 pt-6 border-t border-line flex flex-col md:flex-row justify-between gap-2 font-mono text-[11px] text-ink-400">
+          <p>&copy; {new Date().getFullYear()} Oddaj Amora &middot; {SITE_URL.replace(/^https?:\/\//, '')}</p>
+          <p>Skoczek Suspension Tomasz Pierzchało &middot; NIP 5423158283 &middot; REGON 523948292</p>
         </div>
       </footer>
 

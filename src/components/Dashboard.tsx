@@ -49,26 +49,26 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 gap-4">
         <div>
-           <h1 className="text-3xl font-black text-black tracking-tight uppercase">Panel Klienta</h1>
-           <p className="text-gray-500 mt-1 text-sm">Historia Twoich napraw i statusy bieżące.</p>
+           <h1 className="text-3xl font-bold text-ink-900 tracking-tighter">Panel klienta</h1>
+           <p className="text-ink-500 mt-2 text-[15px]">Historia Twoich napraw i statusy bieżące.</p>
         </div>
         <button 
           onClick={fetchRequests} 
-          className="flex items-start md:items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-skoczek-primary transition"
+          className="flex items-start md:items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-500 hover:text-skoczek-primary transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Odśwież dane
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      <div className="panel overflow-hidden">
         <div className="p-6 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white border border-gray-200 text-skoczek-primary flex items-center justify-center font-black text-2xl rounded-full shadow-sm shrink-0">
+              <div className="w-12 h-12 border border-line text-skoczek-primary flex items-center justify-center font-semibold text-xl shrink-0">
                  {user.name.charAt(0)}
               </div>
               <div>
-                 <h3 className="text-black font-bold text-lg leading-tight">{user.name}</h3>
-                 <p className="text-gray-500 text-sm">{user.email}</p>
+                 <h2 className="text-ink-900 font-semibold text-[17px] leading-tight">{user.name}</h2>
+                 <p className="text-ink-500 text-[14px]">{user.email}</p>
               </div>
            </div>
         </div>
@@ -85,7 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           <>
             <div className="md:hidden bg-gray-50 p-4 space-y-4">
                {requests.map((req) => (
-                 <div key={req.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative overflow-hidden">
+                 <div key={req.id} className="panel p-5 relative overflow-hidden">
                     <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-100">
                         <div className="flex items-center gap-2 text-gray-500 text-xs font-bold uppercase tracking-wider">
                            <Calendar className="w-3 h-3" />
@@ -98,7 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     </div>
 
                     <div className="mb-4">
-                       <h4 className="text-lg font-black text-black mb-1">{req.componentModel}</h4>
+                       <h4 className="text-lg font-semibold text-black mb-1">{req.componentModel}</h4>
                        <p className="text-sm text-gray-600 leading-relaxed">{req.problemDescription}</p>
                     </div>
 
@@ -137,7 +137,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                         </div>
                       </td>
                       <td className="p-5 align-middle text-center">
-                        <span className={`inline-flex items-center gap-2 px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wide ${statusStyles[req.status]}`}>
+                        <span className={`inline-flex items-center gap-2 px-4 py-2 border  text-xs font-bold uppercase tracking-wide ${statusStyles[req.status]}`}>
                           {statusIcons[req.status]}
                           {req.status}
                         </span>

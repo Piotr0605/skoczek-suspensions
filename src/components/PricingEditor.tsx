@@ -22,7 +22,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 const CATEGORY_ORDER: Array<PricingCategory['id']> = ['FRONT', 'REAR', 'OTHER'];
 
 const inputClass =
-  'w-full bg-white border border-gray-300 rounded p-2 text-sm text-gray-900 focus:border-skoczek-primary focus:ring-1 focus:ring-skoczek-primary outline-none transition';
+  'field';
 
 const iconButtonClass =
   'p-2 rounded border border-gray-200 text-gray-500 hover:text-skoczek-primary hover:border-skoczek-primary transition disabled:opacity-30 disabled:hover:text-gray-500 disabled:hover:border-gray-200';
@@ -170,7 +170,7 @@ const PricingEditor: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
         <div>
-          <h3 className="font-black uppercase text-black tracking-tight flex items-center gap-2">
+          <h3 className="font-semibold text-ink-900 tracking-tight flex items-center gap-2">
             <Tag className="w-4 h-4 text-skoczek-primary" /> Edycja cennika strony
           </h3>
           <p className="text-sm text-gray-500 mt-1">
@@ -209,7 +209,7 @@ const PricingEditor: React.FC = () => {
             onClick={handleSave}
             type="button"
             disabled={saving || !dirty || !!loadError}
-            className="flex items-center gap-2 bg-skoczek-primary text-white px-5 py-2 rounded text-xs font-bold uppercase hover:bg-skoczek-primaryHover transition shadow-lg shadow-skoczek-primary/20 disabled:opacity-40 disabled:shadow-none"
+            className="flex items-center gap-2 bg-skoczek-primary text-white px-5 py-2 rounded text-xs font-bold uppercase hover:bg-skoczek-primaryHover transition disabled:opacity-40 disabled:shadow-none"
           >
             <Save className="w-4 h-4" /> {saving ? 'Zapisywanie...' : 'Zapisz cennik'}
           </button>
@@ -289,7 +289,7 @@ const PricingEditor: React.FC = () => {
           </div>
 
           {activeCategory.id === 'OTHER' ? (
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="panel overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left min-w-[640px]">
                   <thead className="bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider">
@@ -388,7 +388,7 @@ const PricingEditor: React.FC = () => {
               {(activeCategory.brands ?? []).map((brand, brandIndex) => (
                 <div
                   key={brandIndex}
-                  className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+                  className="panel overflow-hidden"
                 >
                   <div className="bg-gray-50 border-b border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                     <div className="flex-1">
@@ -396,7 +396,7 @@ const PricingEditor: React.FC = () => {
                         Marka
                       </label>
                       <input
-                        className={`${inputClass} font-black uppercase`}
+                        className={`${inputClass} font-semibold uppercase`}
                         value={brand.name}
                         placeholder="np. Rock Shox"
                         onChange={(e) =>
